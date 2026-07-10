@@ -15,38 +15,86 @@ const products = [
     id:1,
     name:"রং চা",
     price:10,
-    image:"/images/rong-cha.jpg"
+    image:"/assets/products/rong.png"
   },
   {
     id:2,
     name:"লেবু চা",
     price:10,
-    image:"/images/lebu-cha.jpg"
+    image:"/assets/products/lebu.png"
   },
   {
     id:3,
     name:"দুধ চা",
     price:20,
-    image:"/images/milk.jpg"
+    image:"/assets/products/milk.jpg"
   },
   {
     id:4,
     name:"স্পেশাল দুধ চা",
     price:30,
-    image:"/images/special.jpg"
+    image:"/assets/products/special.jpg"
   },
   {
     id:5,
     name:"মালাই চা",
     price:50,
-    image:"/images/malai.jpg"
+    image:"/assets/products/malai.jpg"
   },
   {
     id:6,
-    name:"কফি",
+    name:"কফি(হাফ)",
     price:30,
-    image:"/images/coffee.jpg"
+    image:"/assets/products/coffee.jpg"
   },
+ {
+    id:7,
+    name:"কফি(ফুল)",
+    price:50,
+    image:"/assets/products/coffe.jpg"
+  },
+ {
+    id:8,
+    name:"পোড়ারুটি",
+    price:30,
+    image:"/assets/products/ruti.png"
+  },
+ {
+    id:9,
+    name:"চিপস",
+    price:10,
+    image:"/assets/products/bombay.jpg"
+  },
+ {
+    id:10,
+    name:"চিপস",
+    price:20,
+    image:"/assets/products/Alooz.jpg"
+  },  
+ {
+    id:11,
+    name:"চিপস",
+    price:20,
+    image:"/assets/products/twist.jpg"
+  }, 
+ {
+    id:12,
+    name:"পানি 500ml",
+    price:20,
+    image:"/assets/products/mum.jpg"
+  }, 
+  {
+    id:13,
+    name:"পানি 1L",
+    price:30,
+    image:"/assets/products/mum.jpg"
+  },
+ {
+    id:14,
+    name:"পানি 2L",
+    price:40,
+    image:"/assets/products/mum.jpg"
+  },     
 ];
 
 
