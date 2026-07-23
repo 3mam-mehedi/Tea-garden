@@ -67,100 +67,104 @@ export default function Calculator() {
   const productsFilter = products.filter(item => item.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6">
-      <h1 className="text-2xl md:text-3xl font-bold text-green-700 mb-2">Tea Garden POS</h1>
-      <p className="text-gray-500 mb-6 text-sm md:text-base">Product click করলে order এ add হবে</p>
-
-      {/* রেসপনসিভ গ্রিড: মোবাইল এ কলাম ১টি, ডেস্কটপ এ ২টি */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-6">
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 p-4 md:p-6 text-gray-100">
+      <div className="max-w-full mx-auto">
+        <h1 className="text-2xl md:text-3xl font-bold text-emerald-400 mb-2">Tea Garden POS</h1>
         
-        {/* PRODUCT LIST */}
-        <div className="bg-white rounded-3xl shadow p-4 md:p-5">
-          <div className="relative mb-5">
-            <Search className="absolute left-3 top-3 text-gray-400" />
-            <input
-              placeholder="Search tea..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full border rounded-xl pl-10 py-3"
-            />
-          </div>
+        {/* Full width stacked layout with Glassmorphism */}
+        <div className="flex flex-col gap-6 w-full">
+          
+          {/* PRODUCT LIST */}
+          <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-3xl shadow-xl p-4 md:p-6 w-full">
+            <div className="relative mb-5">
+              <Search className="absolute left-3 top-3.5 text-gray-400" />
+              <input
+                placeholder="Search tea..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl pl-10 py-3 text-base text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500"
+              />
+            </div>
 
-          <div className="space-y-3">
-            {productsFilter.map(product => (
-              <div
-                key={product.id}
-                onClick={() => addProduct(product)}
-                className="flex items-center gap-4 border rounded-2xl p-3 cursor-pointer hover:border-green-600 hover:shadow duration-300"
-              >
-                <img src={product.image} className="w-16 h-16 md:w-20 md:h-20 rounded-xl object-cover" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-base md:text-lg">{product.name}</h3>
-                  <p className="text-green-700 font-bold">৳ {product.price}</p>
-                </div>
-                <button className="bg-green-700 text-white w-10 h-10 rounded-xl flex items-center justify-center">
-                  <Plus />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* CART */}
-        <div className="bg-white rounded-3xl shadow-xl p-4 md:p-5 h-fit lg:sticky lg:top-5">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold flex gap-2"><ShoppingCart /> Order</h2>
-            <button onClick={() => { setCart([]); setPaid(""); }}>
-              <RotateCcw className="text-red-500" />
-            </button>
-          </div>
-
-          <div className="mt-5 space-y-3 max-h-[400px] overflow-y-auto">
-            {cart.length === 0 ? (
-              <p className="text-center text-gray-400 py-10">No Product Added</p>
-            ) : (
-              cart.map(item => (
-                <div key={item.id} className="border rounded-xl p-3 flex gap-3 items-center">
-                  <img src={item.image} className="w-14 h-14 rounded-lg object-cover" />
-                  <div className="flex-1">
-                    <h4 className="font-bold text-sm">{item.name}</h4>
-                    <p className="text-xs">৳ {item.price}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <button onClick={() => decrease(item.id)} className="bg-gray-200 p-1 rounded"><Minus size={14} /></button>
-                      <span className="font-bold text-sm">{item.qty}</span>
-                      <button onClick={() => increase(item.id)} className="bg-green-700 text-white p-1 rounded"><Plus size={14} /></button>
-                      <button onClick={() => remove(item.id)} className="ml-auto text-red-500"><Trash2 size={16} /></button>
-                    </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+              {productsFilter.map(product => (
+                <div
+                  key={product.id}
+                  onClick={() => addProduct(product)}
+                  className="flex items-center gap-2 backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-2 cursor-pointer hover:bg-emerald-500/20 hover:border-emerald-500/30 transition-all duration-300 w-full group"
+                >
+                  <img src={product.image} className="w-10 h-10 rounded-lg object-cover shrink-0 border border-white/10 bg-slate-800" />
+                  <div className="overflow-hidden flex-1">
+                    <h3 className="font-semibold text-xs text-gray-200 group-hover:text-emerald-300 truncate">{product.name}</h3>
+                    <p className="text-emerald-400 font-bold text-[11px]">৳ {product.price}</p>
                   </div>
                 </div>
-              ))
-            )}
+              ))}
+            </div>
           </div>
 
-          <hr className="my-5" />
-          <div className="space-y-3">
-            <div className="flex justify-between text-xl font-bold">
-              <span>Total</span>
-              <span className="text-green-700">৳ {total}</span>
+          {/* CART */}
+          <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-3xl shadow-xl p-4 md:p-6 w-full">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold flex gap-2 text-white"><ShoppingCart /> Order</h2>
+              <button onClick={() => { setCart([]); setPaid(""); }} className="p-1 hover:bg-white/10 rounded-lg transition-all">
+                <RotateCcw className="text-rose-400" />
+              </button>
             </div>
-            <label>Customer Paid</label>
-            <input
-              type="number"
-              value={paid}
-              onChange={e => setPaid(e.target.value)}
-              placeholder="Example 500"
-              className="w-full border rounded-xl p-3"
-            />
-            <div className="bg-gray-100 rounded-xl p-4 text-sm">
-              <p>Customer দিলো: <b> ৳ {paid || 0}</b></p>
-              <p>মোট বিল: <b> ৳ {total}</b></p>
-              <p className="text-green-700 font-bold text-lg">ফেরত পাবে: ৳ {change > 0 ? change : 0}</p>
-              {change < 0 && <p className="text-red-500 font-bold">আরো দিতে হবে: ৳ {Math.abs(change)}</p>}
+
+            <div className="mt-4 space-y-2 max-h-[400px] overflow-y-auto">
+              {cart.length === 0 ? (
+                <p className="text-center text-gray-400 py-10">No Product Added</p>
+              ) : (
+                cart.map(item => (
+                  <div key={item.id} className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-2.5 flex justify-between items-center gap-3 w-full">
+                    <div className="flex items-center gap-2.5">
+                      <img src={item.image} className="w-9 h-9 rounded-md object-cover border border-white/10 bg-slate-800" />
+                      <div>
+                        <h4 className="font-semibold text-xs text-gray-200">{item.name}</h4>
+                        <p className="text-[11px] text-gray-400">৳ {item.price}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <button onClick={() => decrease(item.id)} className="backdrop-blur-sm bg-white/10 border border-white/10 p-1 rounded hover:bg-white/20 transition-all"><Minus size={12} /></button>
+                        <span className="font-bold text-xs w-4 text-center text-gray-200">{item.qty}</span>
+                        <button onClick={() => increase(item.id)} className="backdrop-blur-sm bg-emerald-600/60 border border-emerald-500/30 text-white p-1 rounded hover:bg-emerald-600 transition-all"><Plus size={12} /></button>
+                      </div>
+                      <button onClick={() => remove(item.id)} className="text-rose-400 hover:text-rose-300 ml-1 p-1 hover:bg-white/10 rounded-lg transition-all"><Trash2 size={14} /></button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-            <button className="w-full bg-green-700 text-white py-3 rounded-xl flex justify-center gap-2 font-bold">
-              <Receipt /> Complete Sale
-            </button>
+
+            <hr className="my-4 border-white/10" />
+            <div className="space-y-3">
+              <div className="flex justify-between text-xl font-bold text-white">
+                <span>Total</span>
+                <span className="text-emerald-400">৳ {total}</span>
+              </div>
+              <label className="block font-medium text-gray-300">Customer Paid</label>
+              <input
+                type="number"
+                value={paid}
+                onChange={e => setPaid(e.target.value)}
+                placeholder="0000"
+                className="w-full backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500"
+              />
+              <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 text-sm space-y-1">
+                <p className="text-gray-300">Customer দিলো: <b className="text-white">৳ {paid || 0}</b></p>
+                <p className="text-gray-300">মোট বিল: <b className="text-white">৳ {total}</b></p>
+                <p className="text-emerald-400 font-bold text-lg">ফেরত পাবে: ৳ {change > 0 ? change : 0}</p>
+                {change < 0 && <p className="text-rose-400 font-bold">আরো দিতে হবে: ৳ {Math.abs(change)}</p>}
+              </div>
+              <button className="w-full backdrop-blur-sm bg-emerald-600/80 hover:bg-emerald-600 border border-emerald-500/30 text-white py-3 rounded-xl flex justify-center gap-2 font-bold text-lg shadow-lg transition-all">
+                <Receipt /> Complete Sale
+              </button>
+            </div>
           </div>
+
         </div>
       </div>
     </div>

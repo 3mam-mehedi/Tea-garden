@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
-import Sales from "./pages/Sales";
+import Tali from "./pages/Tali";
 import Expenses from "./pages/Expenses";
 import Reports from "./pages/Reports";
 import Calculator from "./pages/Calculator";
@@ -20,7 +20,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/products" element={<Products />} />
-          <Route path="/sales" element={<Sales />} />
+          <Route path="/tali" element={<Tali />} />
           <Route path="/expenses" element={<Expenses />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/calculator" element={<Calculator />} />

@@ -18,7 +18,7 @@ const menus = [
   { title: "Homepage", path: "/", icon: LayoutDashboard },
   { title: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { title: "Products", path: "/products", icon: Package },
-  { title: "Sales", path: "/sales", icon: ShoppingCart },
+  { title: "Tali", path: "/tali", icon: ShoppingCart },
   { title: "Expenses", path: "/expenses", icon: Receipt },
   { title: "Reports", path: "/reports", icon: ChartColumn },
   { title: "Calculator", path: "/calculator", icon: CalculatorIcon },

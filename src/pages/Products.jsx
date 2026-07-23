@@ -1,666 +1,249 @@
-import { useState } from "react";
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-
-import {
-  Search,
-  Plus,
-  Filter,
-  Package,
-  Boxes,
-  TriangleAlert,
-  CircleOff,
-  Pencil,
-  Trash2,
-  Eye,
-  Download,
-  Upload,
-  X,
-  ImagePlus,
-} from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Pencil, Trash2, ImagePlus, ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
 
 export default function Products() {
-  const [search, setSearch] = useState("");
-  const [showExport, setShowExport] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [preview, setPreview] = useState("");
-
+  const [editId, setEditId] = useState(null);
   const [newProduct, setNewProduct] = useState({
-    name: "",
-    category: "",
-    buy: "",
-    sell: "",
-    stock: "",
-    status: "In Stock",
-    image: "",
+    name: "", category: "", buy: "", sell: "", stock: "", image: "",
   });
 
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: "Milk Tea",
-      category: "Tea",
-      buy: 25,
-      sell: 40,
-      stock: 120,
-      status: "In Stock",
-      image:
-        "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=300",
-    },
-    {
-      id: 2,
-      name: "Black Tea",
-      category: "Tea",
-      buy: 18,
-      sell: 30,
-      stock: 80,
-      status: "In Stock",
-      image:
-        "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=300",
-    },
-    {
-      id: 3,
-      name: "Coffee",
-      category: "Coffee",
-      buy: 40,
-      sell: 60,
-      stock: 55,
-      status: "In Stock",
-      image:
-        "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300",
-    },
-    {
-      id: 4,
-      name: "Chocolate Cake",
-      category: "Bakery",
-      buy: 55,
-      sell: 80,
-      stock: 8,
-      status: "Low Stock",
-      image:
-        "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300",
-    },
-    {
-      id: 5,
-      name: "Toast Biscuit",
-      category: "Bakery",
-      buy: 10,
-      sell: 20,
-      stock: 0,
-      status: "Out of Stock",
-      image:
-        "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=300",
-    },
-  ]);
+  // localStorage থেকে ডেটা লোড করা
+  const [products, setProducts] = useState(() => {
+    const saved = localStorage.getItem("myProducts");
+    return saved ? JSON.parse(saved) : [
+      { id: 1, name: "রং চা", category: "Tea", buy: 5, sell: 10, stock: 100, image: "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=300" }
+    ];
+  });
 
-  const filteredProducts = products.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
-  );
+  // প্রোডাক্ট আপডেট হলে localStorage-এ সেভ করা
+  useEffect(() => {
+    localStorage.setItem("myProducts", JSON.stringify(products));
+  }, [products]);
 
-  const exportExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(products);
-    const wb = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(wb, ws, "Products");
-
-    const excelBuffer = XLSX.write(wb, {
-      bookType: "xlsx",
-      type: "array",
-    });
-
-    const file = new Blob([excelBuffer], {
-      type: "application/octet-stream",
-    });
-
-    saveAs(file, "Products.xlsx");
-  };
-
-  const exportPDF = () => {
-    const doc = new jsPDF();
-
-    doc.text("Tea Garden Products", 14, 15);
-
-    autoTable(doc, {
-      startY: 25,
-      head: [["Product", "Category", "Buy", "Sell", "Stock", "Status"]],
-      body: products.map((item) => [
-        item.name,
-        item.category,
-        item.buy,
-        item.sell,
-        item.stock,
-        item.status,
-      ]),
-    });
-
-    doc.save("Products.pdf");
-  };
-
-  const handleImport = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = (event) => {
-      const data = new Uint8Array(event.target.result);
-
-      const workbook = XLSX.read(data, {
-        type: "array",
-      });
-
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-
-      const result = XLSX.utils.sheet_to_json(sheet);
-
-      setProducts(result);
+  // অন্য কম্পোনেন্ট (Tali) থেকে স্টক আপডেটের ইভেন্ট লিসেন করা
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem("myProducts");
+      if (saved) {
+        setProducts(JSON.parse(saved));
+      }
     };
-
-    reader.readAsArrayBuffer(file);
-  };
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("productStockUpdated", handleStorageChange);
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("productStockUpdated", handleStorageChange);
+    };
+  }, []);
 
   const handleImage = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    const url = URL.createObjectURL(file);
-
-    setPreview(url);
-
-    setNewProduct({
-      ...newProduct,
-      image: url,
-    });
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result);
+      setNewProduct({ ...newProduct, image: reader.result });
+    };
+    reader.readAsDataURL(file);
   };
 
-  const addProduct = () => {
+  const saveProduct = () => {
     if (!newProduct.name) return;
-
-    setProducts([
-      ...products,
-      {
-        id: Date.now(),
-        ...newProduct,
-      },
-    ]);
-
-    setNewProduct({
-      name: "",
-      category: "",
-      buy: "",
-      sell: "",
-      stock: "",
-      status: "In Stock",
-      image: "",
-    });
-
-    setPreview("");
-    setShowModal(false);
+    if (editId) {
+      setProducts(products.map(p => p.id === editId ? { ...newProduct, id: editId } : p));
+    } else {
+      setProducts([...products, { id: Date.now(), ...newProduct }]);
+    }
+    closeModal();
   };
-    return (
-    <>
-      <div className="min-h-screen bg-[#F5F8F6] p-8">
 
-        <input
-          type="file"
-          accept=".xlsx,.xls,.csv"
-          id="importFile"
-          className="hidden"
-          onChange={handleImport}
-        />
+  const deleteProduct = (id) => {
+    if (window.confirm("আপনি কি নিশ্চিত এই প্রোডাক্টটি ডিলিট করতে চান?")) {
+      setProducts(products.filter((p) => p.id !== id));
+    }
+  };
 
+  const moveProduct = (index, direction) => {
+    const newProducts = [...products];
+    const targetIndex = index + direction;
+    if (targetIndex >= 0 && targetIndex < newProducts.length) {
+      [newProducts[index], newProducts[targetIndex]] = [newProducts[targetIndex], newProducts[index]];
+      setProducts(newProducts);
+    }
+  };
+
+  const openEditModal = (product) => {
+    setEditId(product.id);
+    setNewProduct(product);
+    setPreview(product.image);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setEditId(null);
+    setNewProduct({ name: "", category: "", buy: "", sell: "", stock: "", image: "" });
+    setPreview("");
+  };
+
+  return (
+    <div className="min-h-[50vh] bg-gradient-to-br from-emerald-100 via-teal-50 to-cyan-100 p-6 text-gray-800">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-700">Products Inventory</h1>
+          <button 
+            onClick={() => { setEditId(null); setShowModal(true); }} 
+            className="flex items-center gap-2 backdrop-blur-md bg-emerald-600/90 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 border border-emerald-400/40 transition-all text-sm font-semibold"
+          >
+            <Plus size={16} /> Add Product
+          </button>
+        </div>
 
-        <div className="flex flex-col lg:flex-row justify-between items-center gap-5">
+        {/* Product Cards Grid - Made smaller and compact */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3">
+          {products.map((item, index) => {
+            const isOutOfStock = parseInt(item.stock) <= 0 || item.stock === "" || item.stock === null;
 
-          <div>
-
-            <h1 className="text-4xl font-bold text-[#184E2E]">
-              Products
-            </h1>
-
-            <p className="text-gray-500 mt-2">
-              Manage your tea shop products
-            </p>
-
-          </div>
-
-          <div className="flex gap-3 flex-wrap">
-
-            <label
-              htmlFor="importFile"
-              className="flex items-center gap-2 bg-white px-5 py-3 rounded-xl shadow cursor-pointer"
-            >
-              <Upload size={18} />
-              Import
-            </label>
-
-            <div className="relative">
-
-              <button
-                onClick={() => setShowExport(!showExport)}
-                className="flex items-center gap-2 bg-white px-5 py-3 rounded-xl shadow"
+            return (
+              <div 
+                key={item.id} 
+                className={`p-[1px] rounded-2xl shadow-md transition-all duration-300 group flex flex-col ${
+                  isOutOfStock 
+                    ? "bg-gradient-to-br from-gray-200 via-rose-200 to-rose-300 opacity-85" 
+                    : "bg-gradient-to-br from-white via-emerald-200 to-emerald-400 hover:shadow-xl"
+                }`}
               >
-                <Download size={18} />
-                Export
-              </button>
-
-              {showExport && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border z-50">
-
-                  <button
-                    onClick={exportExcel}
-                    className="w-full px-4 py-3 text-left hover:bg-gray-100"
-                  >
-                    📊 Export Excel
-                  </button>
-
-                  <button
-                    onClick={exportPDF}
-                    className="w-full px-4 py-3 text-left hover:bg-gray-100"
-                  >
-                    📄 Export PDF
-                  </button>
-
-                </div>
-              )}
-
-            </div>
-
-            <button
-              onClick={() => setShowModal(true)}
-              className="flex items-center gap-2 bg-[#0B5D2A] text-white px-6 py-3 rounded-xl"
-            >
-              <Plus size={18} />
-              Add Product
-            </button>
-
-          </div>
-
-        </div>
-
-        {/* Search */}
-
-        <div className="bg-white rounded-2xl shadow p-5 mt-8">
-
-          <div className="flex gap-4">
-
-            <div className="flex-1 relative">
-
-              <Search
-                size={18}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-
-              <input
-                type="text"
-                placeholder="Search Product..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 rounded-xl border outline-none focus:border-green-600"
-              />
-
-            </div>
-
-            <button className="bg-[#0B5D2A] text-white px-6 rounded-xl flex items-center gap-2">
-              <Filter size={18} />
-              Filter
-            </button>
-
-          </div>
-
-        </div>
-               {/* Summary Cards */}
-
-        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6 mt-8">
-
-          <div className="bg-white rounded-3xl p-6 shadow">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-gray-500">Total Products</p>
-                <h2 className="text-3xl font-bold mt-2">
-                  {products.length}
-                </h2>
-              </div>
-
-              <div className="bg-green-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center">
-                <Package />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-3xl p-6 shadow">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-gray-500">Categories</p>
-                <h2 className="text-3xl font-bold mt-2">
-                  {new Set(products.map((p) => p.category)).size}
-                </h2>
-              </div>
-
-              <div className="bg-blue-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center">
-                <Boxes />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-3xl p-6 shadow">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-gray-500">Low Stock</p>
-                <h2 className="text-3xl font-bold mt-2">
-                  {products.filter((p) => Number(p.stock) <= 10 && Number(p.stock) > 0).length}
-                </h2>
-              </div>
-
-              <div className="bg-orange-500 text-white w-14 h-14 rounded-2xl flex items-center justify-center">
-                <TriangleAlert />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-3xl p-6 shadow">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-gray-500">Out of Stock</p>
-                <h2 className="text-3xl font-bold mt-2">
-                  {products.filter((p) => Number(p.stock) === 0).length}
-                </h2>
-              </div>
-
-              <div className="bg-red-600 text-white w-14 h-14 rounded-2xl flex items-center justify-center">
-                <CircleOff />
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Products Table */}
-
-        <div className="mt-8 bg-white rounded-3xl shadow overflow-hidden">
-
-          <div className="overflow-x-auto">
-
-            <table className="w-full">
-
-              <thead className="bg-[#0B5D2A] text-white">
-
-                <tr>
-
-                  <th className="px-6 py-4 text-left">Image</th>
-                  <th className="px-6 py-4 text-left">Product</th>
-                  <th className="px-6 py-4 text-left">Category</th>
-                  <th className="px-6 py-4 text-center">Buy</th>
-                  <th className="px-6 py-4 text-center">Sell</th>
-                  <th className="px-6 py-4 text-center">Stock</th>
-                  <th className="px-6 py-4 text-center">Status</th>
-                  <th className="px-6 py-4 text-center">Action</th>
-
-                </tr>
-
-              </thead>
-
-              <tbody>
-
-                {filteredProducts.map((item) => (
-
-                  <tr
-                    key={item.id}
-                    className="border-b hover:bg-green-50 duration-300"
-                  >
-
-                    <td className="px-6 py-4">
-
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-16 h-16 rounded-2xl object-cover"
+                <div className={`backdrop-blur-2xl rounded-[15px] p-2.5 h-full flex flex-col justify-between ${isOutOfStock ? "bg-gray-50/80" : "bg-white/75"}`}>
+                  <div>
+                    <div className="relative mb-2 overflow-hidden rounded-xl aspect-square border border-white/80 bg-white/50 shadow-inner">
+                      <img 
+                        src={item.image || "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=300"} 
+                        className={`w-full h-full object-cover transition-transform duration-500 ${isOutOfStock ? "grayscale opacity-60" : "group-hover:scale-105"}`} 
+                        alt={item.name} 
                       />
-
-                    </td>
-
-                    <td className="px-6 py-4 font-semibold">
-                      {item.name}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {item.category}
-                    </td>
-
-                    <td className="px-6 py-4 text-center">
-                      ৳ {item.buy}
-                    </td>
-
-                    <td className="px-6 py-4 text-center text-green-700 font-bold">
-                      ৳ {item.sell}
-                    </td>
-
-                    <td className="px-6 py-4 text-center">
-                      {item.stock}
-                    </td>
-
-                    <td className="px-6 py-4 text-center">
-
-                      <span
-                        className={`px-3 py-1 rounded-full text-sm
-                        ${
-                          item.status === "In Stock"
-                            ? "bg-green-100 text-green-700"
-                            : item.status === "Low Stock"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {item.status}
+                      
+                      {/* Category Badge */}
+                      <span className="absolute top-1 left-1 backdrop-blur-md bg-white/80 text-emerald-800 text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-white/60 shadow-sm truncate max-w-[70px]">
+                        {item.category || "General"}
                       </span>
 
-                    </td>
+                      {/* Out of Stock Overlay Badge */}
+                      {isOutOfStock && (
+                        <div className="absolute inset-0 bg-rose-950/40 backdrop-blur-[1px] flex flex-col items-center justify-center p-1 text-center">
+                          <span className="bg-rose-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-md shadow-sm uppercase tracking-tighter flex items-center gap-0.5">
+                            <AlertCircle size={10} /> Stock Out
+                          </span>
+                        </div>
+                      )}
+                    </div>
 
-                    <td className="px-6 py-4">
+                    <h3 className="text-xs font-bold text-gray-900 truncate mb-1" title={item.name}>{item.name}</h3>
+                    
+                    <div className="flex justify-between items-center text-[10px] text-gray-600 mb-1.5 bg-white/60 p-1 rounded-md border border-white/80 shadow-sm">
+                      <span>Buy: <strong className="text-gray-800">৳{item.buy}</strong></span>
+                      <span>Stock: <strong className={isOutOfStock ? "text-rose-600 font-extrabold" : "text-emerald-700"}>{item.stock || 0}</strong></span>
+                    </div>
 
-                      <div className="flex justify-center gap-2">
+                    <div className={`text-[11px] font-extrabold mb-2 ${isOutOfStock ? "text-gray-500" : "text-emerald-700"}`}>
+                      Sell: ৳{item.sell}
+                    </div>
+                  </div>
 
-                        <button className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600">
-                          <Eye className="mx-auto" size={18} />
-                        </button>
+                  {/* Actions */}
+                  <div className="flex items-center justify-between pt-1.5 border-t border-gray-900/10">
+                    <div className="flex gap-0.5">
+                      <button onClick={() => moveProduct(index, -1)} className="p-1 backdrop-blur-sm bg-white/80 hover:bg-white border border-white rounded-md text-gray-600 transition-colors shadow-sm" title="Move Left">
+                        <ChevronLeft size={11}/>
+                      </button>
+                      <button onClick={() => moveProduct(index, 1)} className="p-1 backdrop-blur-sm bg-white/80 hover:bg-white border border-white rounded-md text-gray-600 transition-colors shadow-sm" title="Move Right">
+                        <ChevronRight size={11}/>
+                      </button>
+                    </div>
 
-                        <button className="w-10 h-10 rounded-xl bg-green-100 text-green-700">
-                          <Pencil className="mx-auto" size={18} />
-                        </button>
-
-                        <button className="w-10 h-10 rounded-xl bg-red-100 text-red-700">
-                          <Trash2 className="mx-auto" size={18} />
-                        </button>
-
-                      </div>
-
-                    </td>
-
-                  </tr>
-
-                ))}
-
-              </tbody>
-
-            </table>
-
-          </div>
-
+                    <div className="flex gap-0.5">
+                      <button onClick={() => openEditModal(item)} className="p-1 backdrop-blur-sm bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-700 rounded-md transition-colors shadow-sm" title="Edit">
+                        <Pencil size={11} />
+                      </button>
+                      <button onClick={() => deleteProduct(item.id)} className="p-1 backdrop-blur-sm bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-700 rounded-md transition-colors shadow-sm" title="Delete">
+                        <Trash2 size={11} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-               {/* Add Product Modal */}
 
+        {/* Modal */}
         {showModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-
-            <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden">
-
-              {/* Header */}
-
-              <div className="flex items-center justify-between px-6 py-5 border-b">
-
-                <h2 className="text-2xl font-bold text-[#184E2E]">
-                  Add New Product
-                </h2>
-
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="w-10 h-10 rounded-full bg-red-100 hover:bg-red-200 flex items-center justify-center"
-                >
-                  <X size={20} />
-                </button>
-
-              </div>
-
-              <div className="p-6 space-y-5">
-
-                {/* Image */}
-
-                <div className="flex justify-center">
-
-                  <label className="cursor-pointer">
-
-                    <input
-                      type="file"
-                      hidden
-                      accept="image/*"
-                      onChange={handleImage}
-                    />
-
-                    {preview ? (
-                      <img
-                        src={preview}
-                        alt=""
-                        className="w-36 h-36 rounded-2xl object-cover border-2 border-dashed border-green-600"
-                      />
-                    ) : (
-                      <div className="w-36 h-36 rounded-2xl border-2 border-dashed border-green-500 flex flex-col items-center justify-center text-green-600">
-
-                        <ImagePlus size={40} />
-                        <p className="mt-2 text-sm">
-                          Upload Image
-                        </p>
-
-                      </div>
-                    )}
-
+          <div className="fixed inset-0 bg-emerald-950/30 backdrop-blur-md flex items-center justify-center z-50 p-4">
+            <div className="p-[1px] rounded-[25px] bg-gradient-to-br from-white via-emerald-300 to-emerald-500 w-full max-w-md shadow-2xl shadow-emerald-950/20">
+              <div className="backdrop-blur-2xl bg-white/85 rounded-[24px] p-5 text-gray-800">
+                <h2 className="text-xl font-bold mb-3 text-emerald-800">{editId ? "Edit Product" : "Add New Product"}</h2>
+                
+                <div className="flex justify-center mb-3">
+                  <label className="cursor-pointer border-2 border-dashed border-emerald-400 hover:border-emerald-500 rounded-2xl w-24 h-24 flex flex-col items-center justify-center text-emerald-600 backdrop-blur-sm bg-white/60 transition-all shadow-inner">
+                    <input type="file" hidden accept="image/*" onChange={handleImage} />
+                    {preview ? <img src={preview} className="w-full h-full object-cover rounded-2xl" /> : <ImagePlus size={26} />}
                   </label>
-
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-
-                  <input
-                    type="text"
-                    placeholder="Product Name"
-                    value={newProduct.name}
-                    onChange={(e) =>
-                      setNewProduct({
-                        ...newProduct,
-                        name: e.target.value,
-                      })
-                    }
-                    className="border rounded-xl p-3"
+                <input 
+                  type="text" 
+                  placeholder="Name" 
+                  value={newProduct.name} 
+                  onChange={e => setNewProduct({...newProduct, name: e.target.value})} 
+                  className="w-full backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl mb-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
+                />
+                
+                <input 
+                  type="text" 
+                  placeholder="Category" 
+                  value={newProduct.category} 
+                  onChange={e => setNewProduct({...newProduct, category: e.target.value})} 
+                  className="w-full backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl mb-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
+                />
+                
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  <input 
+                    type="number" 
+                    placeholder="Buy" 
+                    value={newProduct.buy} 
+                    onChange={e => setNewProduct({...newProduct, buy: e.target.value})} 
+                    className="backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
                   />
-
-                  <input
-                    type="text"
-                    placeholder="Category"
-                    value={newProduct.category}
-                    onChange={(e) =>
-                      setNewProduct({
-                        ...newProduct,
-                        category: e.target.value,
-                      })
-                    }
-                    className="border rounded-xl p-3"
+                  <input 
+                    type="number" 
+                    placeholder="Sell" 
+                    value={newProduct.sell} 
+                    onChange={e => setNewProduct({...newProduct, sell: e.target.value})} 
+                    className="backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
                   />
-
-                  <input
-                    type="number"
-                    placeholder="Buy Price"
-                    value={newProduct.buy}
-                    onChange={(e) =>
-                      setNewProduct({
-                        ...newProduct,
-                        buy: e.target.value,
-                      })
-                    }
-                    className="border rounded-xl p-3"
+                  <input 
+                    type="number" 
+                    placeholder="Stock" 
+                    value={newProduct.stock} 
+                    onChange={e => setNewProduct({...newProduct, stock: e.target.value})} 
+                    className="backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
                   />
-
-                  <input
-                    type="number"
-                    placeholder="Sell Price"
-                    value={newProduct.sell}
-                    onChange={(e) =>
-                      setNewProduct({
-                        ...newProduct,
-                        sell: e.target.value,
-                      })
-                    }
-                    className="border rounded-xl p-3"
-                  />
-
-                  <input
-                    type="number"
-                    placeholder="Stock"
-                    value={newProduct.stock}
-                    onChange={(e) =>
-                      setNewProduct({
-                        ...newProduct,
-                        stock: e.target.value,
-                      })
-                    }
-                    className="border rounded-xl p-3"
-                  />
-
-                  <select
-                    value={newProduct.status}
-                    onChange={(e) =>
-                      setNewProduct({
-                        ...newProduct,
-                        status: e.target.value,
-                      })
-                    }
-                    className="border rounded-xl p-3"
-                  >
-                    <option>In Stock</option>
-                    <option>Low Stock</option>
-                    <option>Out of Stock</option>
-                  </select>
-
                 </div>
 
-                <div className="flex justify-end gap-3 pt-3">
-
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="px-6 py-3 rounded-xl bg-gray-200"
-                  >
-                    Cancel
+                <div className="flex justify-end gap-2.5">
+                  <button onClick={closeModal} className="px-4 py-2 text-sm backdrop-blur-sm bg-gray-200/80 hover:bg-gray-300 border border-white rounded-xl transition-all font-medium">Cancel</button>
+                  <button onClick={saveProduct} className="px-4 py-2 text-sm backdrop-blur-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-600/20 transition-all font-medium">
+                    {editId ? "Update" : "Save"}
                   </button>
-
-                  <button
-                    onClick={addProduct}
-                    className="px-6 py-3 rounded-xl bg-[#0B5D2A] text-white"
-                  >
-                    Save Product
-                  </button>
-
                 </div>
-
               </div>
-
             </div>
-
           </div>
         )}
-
       </div>
-
-    </>
+    </div>
   );
-}  
+}
