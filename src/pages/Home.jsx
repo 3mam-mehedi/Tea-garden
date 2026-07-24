@@ -121,7 +121,7 @@ export default function Home() {
             <div className="relative group-hover:rotate-3 transition-transform duration-500">
               <div className="absolute inset-0 bg-white/20 rounded-full blur-xl scale-95 group-hover:scale-110 transition-transform duration-500"></div>
               <img
-                src="https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=600"
+                src="/assets/products/rong cha.jpg"
                 alt="Milk Tea"
                 className="w-36 h-36 sm:w-44 sm:h-44 rounded-full object-cover border-[6px] border-white/30 shadow-xl relative z-10 group-hover:scale-105 transition-transform duration-500"
               />
@@ -140,10 +140,10 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { name: "Fresh Milk", stock: 3, image: "https://images.unsplash.com/photo-1563636619-e9143da7973b?w=200" },
-              { name: "Sugar", stock: 5, image: "https://images.unsplash.com/photo-1581441363689-1f3c3c552635?w=200" },
-              { name: "Cake", stock: 2, image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200" },
-              { name: "Toast Biscuit", stock: 4, image: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=200" },
+              { name: "Fresh Milk", stock: 3, image: "/assets/products/alooz.webp" },
+              { name: "Sugar", stock: 5, image: "/assets/products/lays.jpg" },
+              { name: "Cake", stock: 2, image: "/assets/products/sun.jpg" },
+              { name: "Toast Biscuit", stock: 4, image: "/assets/products/twist.jpg" },
             ].map((item, index) => (
               <div
                 key={index}
@@ -234,32 +234,32 @@ export default function Home() {
                 {
                   name: "Milk Tea",
                   sold: 82,
-                  image: "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=300",
+                  image: "/assets/products/twist.jpg",
                 },
                 {
                   name: "Coffee",
                   sold: 61,
-                  image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300",
+                  image: "/assets/products/coffee.jpg",
                 },
                 {
                   name: "Cake",
                   sold: 48,
-                  image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=300",
+                  image: "/assets/products/sun.jpg",
                 },
                 {
                   name: "Black Tea",
                   sold: 41,
-                  image: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=300",
+                  image: "/assets/products/black-tea.jpg",
                 },
                 {
                   name: "Green Tea",
                   sold: 35,
-                  image: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300",
+                  image: "/assets/products/green-tea.jpg",
                 },
                 {
                   name: "Lemon Tea",
                   sold: 29,
-                  image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300",
+                  image: "/assets/products/lemon-tea.jpg",
                 },
               ].map((item, index) => (
                 <div

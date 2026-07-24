@@ -90,21 +90,21 @@ export default function Products() {
   };
 
   return (
-    <div className="min-h-[50vh] bg-gradient-to-br from-emerald-100 via-teal-50 to-cyan-100 p-6 text-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-teal-50 to-cyan-100 p-3 sm:p-6 text-gray-800">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-700">Products Inventory</h1>
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <h1 className="text-xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-700">Products Inventory</h1>
           <button 
             onClick={() => { setEditId(null); setShowModal(true); }} 
-            className="flex items-center gap-2 backdrop-blur-md bg-emerald-600/90 hover:bg-emerald-600 text-white px-5 py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 border border-emerald-400/40 transition-all text-sm font-semibold"
+            className="flex items-center gap-1.5 sm:gap-2 backdrop-blur-md bg-emerald-600/90 hover:bg-emerald-600 text-white px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 border border-emerald-400/40 transition-all text-xs sm:text-sm font-semibold"
           >
             <Plus size={16} /> Add Product
           </button>
         </div>
 
-        {/* Product Cards Grid - Made smaller and compact */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-3">
+        {/* Product Cards Grid - Optimized for Mobile (2 cols on mobile, scales up smoothly) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-2.5 sm:gap-3">
           {products.map((item, index) => {
             const isOutOfStock = parseInt(item.stock) <= 0 || item.stock === "" || item.stock === null;
 
@@ -117,7 +117,7 @@ export default function Products() {
                     : "bg-gradient-to-br from-white via-emerald-200 to-emerald-400 hover:shadow-xl"
                 }`}
               >
-                <div className={`backdrop-blur-2xl rounded-[15px] p-2.5 h-full flex flex-col justify-between ${isOutOfStock ? "bg-gray-50/80" : "bg-white/75"}`}>
+                <div className={`backdrop-blur-2xl rounded-[15px] p-2 sm:p-2.5 h-full flex flex-col justify-between ${isOutOfStock ? "bg-gray-50/80" : "bg-white/75"}`}>
                   <div>
                     <div className="relative mb-2 overflow-hidden rounded-xl aspect-square border border-white/80 bg-white/50 shadow-inner">
                       <img 
@@ -127,7 +127,7 @@ export default function Products() {
                       />
                       
                       {/* Category Badge */}
-                      <span className="absolute top-1 left-1 backdrop-blur-md bg-white/80 text-emerald-800 text-[9px] font-bold px-1.5 py-0.2 rounded-full border border-white/60 shadow-sm truncate max-w-[70px]">
+                      <span className="absolute top-1 left-1 backdrop-blur-md bg-white/80 text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-white/60 shadow-sm truncate max-w-[65px]">
                         {item.category || "General"}
                       </span>
 
@@ -179,17 +179,17 @@ export default function Products() {
           })}
         </div>
 
-        {/* Modal */}
+        {/* Modal - Mobile Optimized */}
         {showModal && (
-          <div className="fixed inset-0 bg-emerald-950/30 backdrop-blur-md flex items-center justify-center z-50 p-4">
-            <div className="p-[1px] rounded-[25px] bg-gradient-to-br from-white via-emerald-300 to-emerald-500 w-full max-w-md shadow-2xl shadow-emerald-950/20">
-              <div className="backdrop-blur-2xl bg-white/85 rounded-[24px] p-5 text-gray-800">
-                <h2 className="text-xl font-bold mb-3 text-emerald-800">{editId ? "Edit Product" : "Add New Product"}</h2>
+          <div className="fixed inset-0 bg-emerald-950/40 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+            <div className="p-[1px] rounded-[25px] bg-gradient-to-br from-white via-emerald-300 to-emerald-500 w-full max-w-md shadow-2xl shadow-emerald-950/20 my-auto">
+              <div className="backdrop-blur-2xl bg-white/90 rounded-[24px] p-4 sm:p-5 text-gray-800">
+                <h2 className="text-lg sm:text-xl font-bold mb-3 text-emerald-800">{editId ? "Edit Product" : "Add New Product"}</h2>
                 
                 <div className="flex justify-center mb-3">
-                  <label className="cursor-pointer border-2 border-dashed border-emerald-400 hover:border-emerald-500 rounded-2xl w-24 h-24 flex flex-col items-center justify-center text-emerald-600 backdrop-blur-sm bg-white/60 transition-all shadow-inner">
+                  <label className="cursor-pointer border-2 border-dashed border-emerald-400 hover:border-emerald-500 rounded-2xl w-20 h-20 sm:w-24 sm:h-24 flex flex-col items-center justify-center text-emerald-600 backdrop-blur-sm bg-white/60 transition-all shadow-inner">
                     <input type="file" hidden accept="image/*" onChange={handleImage} />
-                    {preview ? <img src={preview} className="w-full h-full object-cover rounded-2xl" /> : <ImagePlus size={26} />}
+                    {preview ? <img src={preview} className="w-full h-full object-cover rounded-2xl" /> : <ImagePlus size={24} />}
                   </label>
                 </div>
 
@@ -198,7 +198,7 @@ export default function Products() {
                   placeholder="Name" 
                   value={newProduct.name} 
                   onChange={e => setNewProduct({...newProduct, name: e.target.value})} 
-                  className="w-full backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl mb-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
+                  className="w-full backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl mb-2.5 text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
                 />
                 
                 <input 
@@ -206,7 +206,7 @@ export default function Products() {
                   placeholder="Category" 
                   value={newProduct.category} 
                   onChange={e => setNewProduct({...newProduct, category: e.target.value})} 
-                  className="w-full backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl mb-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
+                  className="w-full backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl mb-2.5 text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
                 />
                 
                 <div className="grid grid-cols-3 gap-2 mb-3">
@@ -215,27 +215,27 @@ export default function Products() {
                     placeholder="Buy" 
                     value={newProduct.buy} 
                     onChange={e => setNewProduct({...newProduct, buy: e.target.value})} 
-                    className="backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
+                    className="backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
                   />
                   <input 
                     type="number" 
                     placeholder="Sell" 
                     value={newProduct.sell} 
                     onChange={e => setNewProduct({...newProduct, sell: e.target.value})} 
-                    className="backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
+                    className="backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
                   />
                   <input 
                     type="number" 
                     placeholder="Stock" 
                     value={newProduct.stock} 
                     onChange={e => setNewProduct({...newProduct, stock: e.target.value})} 
-                    className="backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
+                    className="backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
                   />
                 </div>
 
                 <div className="flex justify-end gap-2.5">
-                  <button onClick={closeModal} className="px-4 py-2 text-sm backdrop-blur-sm bg-gray-200/80 hover:bg-gray-300 border border-white rounded-xl transition-all font-medium">Cancel</button>
-                  <button onClick={saveProduct} className="px-4 py-2 text-sm backdrop-blur-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-600/20 transition-all font-medium">
+                  <button onClick={closeModal} className="px-4 py-2 text-xs sm:text-sm backdrop-blur-sm bg-gray-200/80 hover:bg-gray-300 border border-white rounded-xl transition-all font-medium">Cancel</button>
+                  <button onClick={saveProduct} className="px-4 py-2 text-xs sm:text-sm backdrop-blur-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-600/20 transition-all font-medium">
                     {editId ? "Update" : "Save"}
                   </button>
                 </div>
