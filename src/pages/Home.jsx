@@ -249,17 +249,17 @@ export default function Home() {
                 {
                   name: "Black Tea",
                   sold: 41,
-                  image: "/assets/products/black-tea.jpg",
+                  image: "/assets/products/sun.jpg",
                 },
                 {
                   name: "Green Tea",
                   sold: 35,
-                  image: "/assets/products/green-tea.jpg",
+                  image: "/assets/products/coffee.jpg",
                 },
                 {
                   name: "Lemon Tea",
                   sold: 29,
-                  image: "/assets/products/lemon-tea.jpg",
+                  image: "/assets/products/nachos.jpg",
                 },
               ].map((item, index) => (
                 <div
