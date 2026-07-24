@@ -1,27 +1,27 @@
 import { NavLink } from "react-router-dom";
 import {
-  LayoutDashboard,
-  Package,
-  ShoppingCart,
   Receipt,
   ChartColumn,
-  Calculator as CalculatorIcon,
   ChevronLeft,
   ChevronRight,
   Menu,
   X,
-  Coffee,
 } from "lucide-react";
+import { SiHomeassistantcommunitystore ,SiCoffeescript} from "react-icons/si";
+import { AiOutlineDashboard } from "react-icons/ai";
+import { MdOutlineProductionQuantityLimits } from "react-icons/md";
+import { GiBookmark,GiCoffeeCup} from "react-icons/gi";
+import { BsCalculatorFill } from "react-icons/bs";
 import { useState, useEffect } from "react";
 
 const menus = [
-  { title: "Homepage", path: "/", icon: LayoutDashboard },
-  { title: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-  { title: "Products", path: "/products", icon: Package },
-  { title: "Tali", path: "/tali", icon: ShoppingCart },
+  { title: "Homepage", path: "/", icon: SiHomeassistantcommunitystore },
+  { title: "Dashboard", path: "/dashboard", icon: AiOutlineDashboard },
+  { title: "Products", path: "/products", icon: MdOutlineProductionQuantityLimits },
+  { title: "Tali", path: "/tali", icon: GiBookmark },
   { title: "Expenses", path: "/expenses", icon: Receipt },
   { title: "Reports", path: "/reports", icon: ChartColumn },
-  { title: "Calculator", path: "/calculator", icon: CalculatorIcon },
+  { title: "Calculator", path: "/calculator", icon: BsCalculatorFill },
 ];
 
 export default function Navbar() {
@@ -79,10 +79,10 @@ export default function Navbar() {
             {(!collapse || isMobile) && (
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0">
-                  <Coffee className="text-[#0A5D2D]" size={20} />
+                  <SiCoffeescript className="text-[#0A5D2D]" size={24} />
                 </div>
                 <div>
-                  <h2 className="font-bold text-lg">TeaPoint</h2>
+                  <h2 className="font-bold text-lg">Tea Garden</h2>
                   <p className="text-[10px] text-white/70">Tea Management</p>
                 </div>
               </div>
@@ -123,7 +123,7 @@ export default function Navbar() {
         <div className="relative z-10 px-3 pb-4">
           <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-3">
             <div className="flex items-center gap-3">
-              <img src="https://i.pravatar.cc/100?img=12" alt="profile" className="w-10 h-10 rounded-full object-cover" />
+              <img src="/assets/logo/tea.jpg" alt="profile" className="w-10 h-10 rounded-full object-cover" />
               {(!collapse || isMobile) && (
                 <div className="flex-1 overflow-hidden">
                   <h4 className="font-semibold text-sm truncate">Tea Garden</h4>
