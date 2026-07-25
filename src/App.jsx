@@ -1,4 +1,5 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 
 import Home from "./pages/Home";
@@ -7,10 +8,20 @@ import Products from "./pages/Products";
 import Tali from "./pages/Tali";
 import Calculator from "./pages/Calculator";
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }, [pathname]);
+
+  return null;
+}
 
 function App() {
   return (
     <div className="min-h-screen bg-gray-100">
+      <ScrollToTop />
       <Navbar />
 
       <main className="lg:ml-[230px] p-6">
