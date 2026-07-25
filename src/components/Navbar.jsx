@@ -1,7 +1,5 @@
 import { NavLink } from "react-router-dom";
 import {
-  Receipt,
-  ChartColumn,
   ChevronLeft,
   ChevronRight,
   Menu,
@@ -10,7 +8,7 @@ import {
 import { SiHomeassistantcommunitystore ,SiCoffeescript} from "react-icons/si";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
-import { GiBookmark,GiCoffeeCup} from "react-icons/gi";
+import { GiBookmark } from "react-icons/gi";
 import { BsCalculatorFill } from "react-icons/bs";
 import { useState, useEffect } from "react";
 
@@ -19,8 +17,6 @@ const menus = [
   { title: "Dashboard", path: "/dashboard", icon: AiOutlineDashboard },
   { title: "Products", path: "/products", icon: MdOutlineProductionQuantityLimits },
   { title: "Tali", path: "/tali", icon: GiBookmark },
-  { title: "Expenses", path: "/expenses", icon: Receipt },
-  { title: "Reports", path: "/reports", icon: ChartColumn },
   { title: "Calculator", path: "/calculator", icon: BsCalculatorFill },
 ];
 
