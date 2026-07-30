@@ -5,7 +5,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { SiHomeassistantcommunitystore ,SiCoffeescript} from "react-icons/si";
+import { SiHomeassistantcommunitystore, SiCoffeescript } from "react-icons/si";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 import { GiBookmark } from "react-icons/gi";
@@ -38,31 +38,40 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Mobile Button */}
+      {/* Mobile Button (Right Side Glassmorphism & Smooth Animation) */}
       <button
-        onClick={() => setMobileOpen(true)}
-        className="lg:hidden fixed top-5 left-5 z-40 bg-[#0A5D2D] text-white p-2 rounded-xl shadow-lg"
+        onClick={() => setMobileOpen(!mobileOpen)}
+        className="lg:hidden fixed top-4 right-4 z-40 backdrop-blur-md bg-white/75 border border-white/80 text-[#0A5D2D] p-2.5 rounded-2xl shadow-xl transition-all duration-300 active:scale-95"
       >
-        <Menu size={22} />
+        <div className="relative w-[22px] h-[22px] flex items-center justify-center">
+          <Menu 
+            size={22} 
+            className={`absolute transition-all duration-300 transform ${mobileOpen ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"}`} 
+          />
+          <X 
+            size={22} 
+            className={`absolute transition-all duration-300 transform ${mobileOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"}`} 
+          />
+        </div>
       </button>
 
-      {/* Overlay */}
-      {mobileOpen && (
-        <div
-          onClick={() => setMobileOpen(false)}
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-        />
-      )}
+      {/* Overlay with Smooth Fade Animation */}
+      <div
+        onClick={() => setMobileOpen(false)}
+        className={`fixed inset-0 bg-black/50 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300 ${
+          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      />
 
       <aside
         className={`
           fixed top-0 left-0 h-screen z-50
-          bg-[#0B5D2A] text-white flex flex-col justify-between overflow-hidden transition-all duration-300
+          bg-[#0B5D2A] text-white flex flex-col justify-between overflow-hidden transition-all duration-300 ease-in-out
           ${collapse ? "w-[80px]" : "w-[230px]"}
-          ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          ${mobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0"}
         `}
       >
-        {/* Background Decorations (অপরিবর্তিত) */}
+        {/* Background Decorations */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full bg-[#16803d]/40"></div>
           <div className="absolute top-44 -right-20 w-72 h-72 bg-[#0F6D34]" style={{ clipPath: "polygon(0 0,100% 50%,0 100%)" }} />
@@ -86,9 +95,9 @@ export default function Navbar() {
 
             <button
               onClick={() => isMobile ? setMobileOpen(false) : setCollapse(!collapse)}
-              className="bg-white/10 p-2 rounded-xl hover:bg-white/20 transition-colors"
+              className="hidden lg:flex bg-white/10 p-2 rounded-xl hover:bg-white/20 transition-colors"
             >
-              {isMobile ? <X size={18} /> : collapse ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+              {collapse ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </button>
           </div>
 
