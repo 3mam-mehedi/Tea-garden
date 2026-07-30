@@ -62,14 +62,12 @@ export default function Calculator() {
     };
   }, []);
 
-  // 🔴 Error Fix: try-catch for local storage
   useEffect(() => {
     try {
       localStorage.setItem("myPosCart", JSON.stringify(cart));
     } catch (e) {
       if (e.name === "QuotaExceededError") {
         console.warn("Local storage quota exceeded. Unable to save cart state.");
-        // চাইলে এখানে অ্যালার্ট দিতে পারেন: alert("স্টোরেজ লিমিট পার হয়ে গেছে!");
       }
     }
   }, [cart]);
@@ -132,7 +130,7 @@ export default function Calculator() {
     const newOrderTransaction = {
       id: Date.now() + Math.random(),
       isOrderGroup: true, 
-      items: cart.map(c => ({ name: c.name, price: c.price, qty: c.qty })), // ইমেজ রিমুভ করা হয়েছে স্পেস বাঁচানোর জন্য
+      items: cart.map(c => ({ name: c.name, price: c.price, qty: c.qty })), 
       amount: total,
       type: "income",
       date: formattedDate,
@@ -141,13 +139,12 @@ export default function Calculator() {
 
     taliList.unshift(newOrderTransaction);
 
-    // 🔴 Error Fix: Safe Storage Attempt for Tali
     try {
       localStorage.setItem("myTali", JSON.stringify(taliList));
     } catch (e) {
       if (e.name === "QuotaExceededError") {
-        alert("স্টোরেজ পূর্ণ হয়ে গেছে! দয়া করে কিছু পুরোনো সেলস হিস্ট্রি ডিলিট করুন।");
-        return; // স্টোরেজ ফুল থাকলে প্রসেস ক্যান্সেল করবে
+        alert("স্টোরেজ পূর্ণ হয়ে গেছে! দয়া করে কিছু পুরোনো সেলস হিস্ট্রি ডিলিট করুন।");
+        return; 
       }
     }
 
@@ -180,20 +177,20 @@ export default function Calculator() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-900 p-4 md:p-6 text-gray-100">
+    <div className="w-full min-h-screen p-2 sm:p-6 text-gray-800 max-w-full overflow-x-hidden">
       <div className="max-w-full mx-auto">
-        <h1 className="text-2xl md:text-3xl font-bold text-emerald-400 mb-4">Tea Garden POS</h1>
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#0b5d2a] mb-3 sm:mb-4 px-1">Tea Garden POS</h1>
         
-        <div className="flex flex-col gap-6 w-full">
+        <div className="flex flex-col gap-4 sm:gap-6 w-full">
           {/* PRODUCT LIST SECTION */}
-          <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-3xl shadow-xl p-4 md:p-6 w-full">
-            <div className="relative mb-5">
-              <Search className="absolute left-3 top-3.5 text-gray-400" />
+          <div className=" bg-white/75 border border-white/80 rounded-2xl sm:rounded-3xl shadow-xl p-3 sm:p-6 w-full">
+            <div className="relative mb-3 sm:mb-5">
+              <Search className="absolute left-3 top-3 text-gray-400" size={18} />
               <input
                 placeholder="Search products..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                className="w-full backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl pl-10 py-3 text-base text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500"
+                className="w-full bg-white/80 border border-white rounded-xl pl-9 pr-3 py-2.5 sm:py-3 text-xs sm:text-base text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm"
               />
             </div>
 
@@ -201,28 +198,28 @@ export default function Calculator() {
             {unlimitedProducts.length > 0 && (
               <div className="mb-4">
                 <div className="flex items-center gap-2 mb-2 px-1">
-                  <PackageCheck size={16} className="text-emerald-400" />
-                  <p className="text-xs font-bold text-emerald-300 uppercase tracking-wider">Always Available (Unlimited Stock)</p>
+                  <PackageCheck size={16} className="text-emerald-700" />
+                  <p className="text-[11px] sm:text-xs font-bold text-emerald-800 uppercase tracking-wider">Always Available (Unlimited Stock)</p>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                   {unlimitedProducts
                     .filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
                     .map(product => (
                       <div
                         key={product.id}
                         onClick={() => addProduct(product)}
-                        className="flex items-center gap-2 backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-2 cursor-pointer hover:bg-emerald-500/20 hover:border-emerald-500/30 transition-all duration-300 w-full group"
+                        className="flex items-center gap-2 backdrop-blur-sm bg-white/60 border border-white/80 rounded-xl p-2 cursor-pointer hover:bg-emerald-500/15 hover:border-emerald-500/30 transition-all duration-300 w-full group shadow-sm min-w-0"
                       >
                         <img 
                           src={product.image} 
-                          className="w-10 h-10 rounded-lg object-cover shrink-0 border border-white/10 bg-slate-800" 
-                          onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=300"; }}
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0 border border-white/60 bg-gray-100" 
+                          onError={(e) => { e.target.src = "/assets/products/rong cha.jpg"; }}
                         />
-                        <div className="overflow-hidden flex-1">
-                          <h3 className="font-semibold text-xs text-gray-200 group-hover:text-emerald-300 truncate flex items-center gap-1">
-                            {product.name} <Infinity size={10} className="text-emerald-400 shrink-0" />
+                        <div className="overflow-hidden flex-1 min-w-0">
+                          <h3 className="font-semibold text-[11px] sm:text-xs text-gray-800 group-hover:text-emerald-800 truncate flex items-center gap-1">
+                            {product.name} <Infinity size={10} className="text-emerald-700 shrink-0" />
                           </h3>
-                          <p className="text-emerald-400 font-bold text-[11px]">৳ {product.price}</p>
+                          <p className="text-emerald-700 font-bold text-[10px] sm:text-[11px]">৳ {product.price}</p>
                         </div>
                       </div>
                     ))}
@@ -233,13 +230,13 @@ export default function Calculator() {
             {/* Inventory Products */}
             <div>
               <div className="flex items-center gap-2 mb-2 px-1">
-                <Layers size={16} className="text-teal-400" />
-                <p className="text-xs font-bold text-gray-300 uppercase tracking-wider">Inventory Items (Stock Managed)</p>
+                <Layers size={16} className="text-teal-700" />
+                <p className="text-[11px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Inventory Items (Stock Managed)</p>
               </div>
               {inventoryProducts.length === 0 ? (
-                <p className="text-xs text-gray-400 px-1 py-2">No stock-managed products available.</p>
+                <p className="text-xs text-gray-500 px-1 py-2">No stock-managed products available.</p>
               ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                   {inventoryProducts
                     .filter(item => item.name.toLowerCase().includes(search.toLowerCase()))
                     .map(product => {
@@ -248,24 +245,24 @@ export default function Calculator() {
                         <div
                           key={product.id}
                           onClick={() => !isOutOfStock && addProduct(product)}
-                          className={`flex items-center gap-2 backdrop-blur-sm border rounded-xl p-2 transition-all duration-300 w-full group ${
+                          className={`flex items-center gap-2 backdrop-blur-sm border rounded-xl p-2 transition-all duration-300 w-full group shadow-sm min-w-0 ${
                             isOutOfStock 
-                              ? "opacity-50 bg-rose-950/20 border-rose-500/20 cursor-not-allowed" 
-                              : "bg-white/5 border-white/10 hover:bg-emerald-500/20 hover:border-emerald-500/30 cursor-pointer"
+                              ? "opacity-60 bg-rose-50/80 border-rose-200 cursor-not-allowed" 
+                              : "bg-white/60 border-white/80 hover:bg-emerald-500/15 hover:border-emerald-500/30 cursor-pointer"
                           }`}
                         >
                           <img 
                             src={product.image} 
-                            className="w-10 h-10 rounded-lg object-cover shrink-0 border border-white/10 bg-slate-800" 
-                            onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=300"; }}
+                            className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-cover shrink-0 border border-white/60 bg-gray-100" 
+                            onError={(e) => { e.target.src = "/assets/products/rong cha.jpg"; }}
                           />
-                          <div className="overflow-hidden flex-1">
-                            <h3 className={`font-semibold text-xs truncate ${isOutOfStock ? "text-rose-400" : "text-gray-200 group-hover:text-emerald-300"}`}>
+                          <div className="overflow-hidden flex-1 min-w-0">
+                            <h3 className={`font-semibold text-[11px] sm:text-xs truncate ${isOutOfStock ? "text-rose-700 font-bold" : "text-gray-800 group-hover:text-emerald-800"}`}>
                               {product.name}
                             </h3>
-                            <div className="flex items-center justify-between">
-                              <p className="text-emerald-400 font-bold text-[11px]">৳ {product.price}</p>
-                              <span className={`text-[9px] px-1 rounded ${isOutOfStock ? "bg-rose-500/20 text-rose-300 font-bold" : "bg-white/10 text-gray-300"}`}>
+                            <div className="flex items-center justify-between gap-1">
+                              <p className="text-emerald-700 font-bold text-[10px] sm:text-[11px]">৳ {product.price}</p>
+                              <span className={`text-[9px] px-1 rounded truncate ${isOutOfStock ? "bg-rose-100 text-rose-700 font-bold" : "bg-gray-100 text-gray-600"}`}>
                                 Stock: {product.stock || 0}
                               </span>
                             </div>
@@ -279,70 +276,70 @@ export default function Calculator() {
           </div>
 
           {/* CART SECTION */}
-          <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-3xl shadow-xl p-4 md:p-6 w-full">
+          <div className=" bg-white/75 border border-white/80 rounded-2xl sm:rounded-3xl shadow-xl p-3 sm:p-6 w-full">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold flex gap-2 text-white"><ShoppingCart /> Order</h2>
-              <button onClick={() => { setCart([]); localStorage.removeItem("myPosCart"); setPaid(""); }} className="p-1 hover:bg-white/10 rounded-lg transition-all" title="Reset Cart">
-                <RotateCcw className="text-rose-400" />
+              <h2 className="text-lg sm:text-xl font-bold flex gap-2 text-gray-800 items-center"><ShoppingCart className="text-emerald-700" size={20} /> Order</h2>
+              <button onClick={() => { setCart([]); localStorage.removeItem("myPosCart"); setPaid(""); }} className="p-1.5 hover:bg-rose-50 rounded-lg transition-all" title="Reset Cart">
+                <RotateCcw className="text-rose-600" size={16} />
               </button>
             </div>
 
-            <div className="mt-4 space-y-2 max-h-[400px] overflow-y-auto">
+            <div className="mt-3 sm:mt-4 space-y-2 max-h-[350px] overflow-y-auto">
               {cart.length === 0 ? (
-                <p className="text-center text-gray-400 py-10">No Product Added</p>
+                <p className="text-center text-gray-500 py-6 text-xs">No Product Added</p>
               ) : (
                 cart.map(item => (
-                  <div key={item.id} className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-2.5 flex justify-between items-center gap-3 w-full">
-                    <div className="flex items-center gap-2.5">
+                  <div key={item.id} className=" bg-white/60 border border-white/80 rounded-xl p-2 sm:p-2.5 flex justify-between items-center gap-2 w-full shadow-sm">
+                    <div className="flex items-center gap-2 min-w-0">
                       <img 
                         src={item.image} 
-                        className="w-9 h-9 rounded-md object-cover border border-white/10 bg-slate-800" 
-                        onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=300"; }}
+                        className="w-8 h-8 sm:w-9 sm:h-9 rounded-md object-cover border border-white/60 bg-gray-100 shrink-0" 
+                        onError={(e) => { e.target.src = "/assets/products/rong cha.jpg"; }}
                       />
-                      <div>
-                        <h4 className="font-semibold text-xs text-gray-200">{item.name}</h4>
-                        <p className="text-[11px] text-gray-400">৳ {item.price}</p>
+                      <div className="min-w-0">
+                        <h4 className="font-semibold text-[11px] sm:text-xs text-gray-800 truncate">{item.name}</h4>
+                        <p className="text-[10px] sm:text-[11px] text-gray-500">৳ {item.price}</p>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1.5">
-                        <button onClick={() => decrease(item.id)} className="backdrop-blur-sm bg-white/10 border border-white/10 p-1 rounded hover:bg-white/20 transition-all"><Minus size={12} /></button>
-                        <span className="font-bold text-xs w-4 text-center text-gray-200">{item.qty}</span>
-                        <button onClick={() => increase(item.id)} className="backdrop-blur-sm bg-emerald-600/60 border border-emerald-500/30 text-white p-1 rounded hover:bg-emerald-600 transition-all"><Plus size={12} /></button>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="flex items-center gap-1 sm:gap-1.5">
+                        <button onClick={() => decrease(item.id)} className=" bg-gray-100 border border-gray-200 p-1 rounded hover:bg-gray-200 transition-all text-gray-700"><Minus size={10} /></button>
+                        <span className="font-bold text-xs w-4 text-center text-gray-800">{item.qty}</span>
+                        <button onClick={() => increase(item.id)} className=" bg-emerald-600 hover:bg-emerald-700 border border-emerald-500/30 text-white p-1 rounded transition-all"><Plus size={10} /></button>
                       </div>
-                      <button onClick={() => remove(item.id)} className="text-rose-400 hover:text-rose-300 ml-1 p-1 hover:bg-white/10 rounded-lg transition-all"><Trash2 size={14} /></button>
+                      <button onClick={() => remove(item.id)} className="text-gray-400 hover:text-rose-600 p-1 hover:bg-rose-50 rounded-lg transition-all"><Trash2 size={14} /></button>
                     </div>
                   </div>
                 ))
               )}
             </div>
 
-            <hr className="my-4 border-white/10" />
-            <div className="space-y-3">
-              <div className="flex justify-between text-xl font-bold text-white">
+            <hr className="my-3 sm:my-4 border-gray-200" />
+            <div className="space-y-2.5 sm:space-y-3">
+              <div className="flex justify-between text-lg sm:text-xl font-bold text-gray-800">
                 <span>Total</span>
-                <span className="text-emerald-400">৳ {total}</span>
+                <span className="text-emerald-700">৳ {total}</span>
               </div>
-              <label className="block font-medium text-gray-300">Customer Paid</label>
+              <label className="block font-medium text-xs sm:text-sm text-gray-700">Customer Paid</label>
               <input
                 type="number"
                 value={paid}
                 onChange={e => setPaid(e.target.value)}
                 placeholder="0000"
-                className="w-full backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-3 text-white placeholder-gray-400 focus:outline-none focus:border-emerald-500"
+                className="w-full  bg-white/80 border border-white rounded-xl p-2.5 sm:p-3 text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm"
               />
-              <div className="backdrop-blur-sm bg-white/5 border border-white/10 rounded-xl p-4 text-sm space-y-1">
-                <p className="text-gray-300">Customer দিলো: <b className="text-white">৳ {paid || 0}</b></p>
-                <p className="text-gray-300">মোট বিল: <b className="text-white">৳ {total}</b></p>
-                <p className="text-emerald-400 font-bold text-lg">ফেরত পাবে: ৳ {change > 0 ? change : 0}</p>
-                {change < 0 && <p className="text-rose-400 font-bold">আরো দিতে হবে: ৳ {Math.abs(change)}</p>}
+              <div className=" bg-white/60 border border-white/80 rounded-xl p-3 sm:p-4 text-xs sm:text-sm space-y-1 shadow-sm">
+                <p className="text-gray-700">Customer দিলো: <b className="text-gray-900">৳ {paid || 0}</b></p>
+                <p className="text-gray-700">মোট বিল: <b className="text-gray-900">৳ {total}</b></p>
+                <p className="text-emerald-700 font-bold text-base sm:text-lg">ফেরত পাবে: ৳ {change > 0 ? change : 0}</p>
+                {change < 0 && <p className="text-rose-600 font-bold text-xs sm:text-sm">আরো দিতে হবে: ৳ {Math.abs(change)}</p>}
               </div>
               <button 
                 onClick={handleCompleteSale}
-                className="w-full backdrop-blur-sm bg-emerald-600/80 hover:bg-emerald-600 border border-emerald-500/30 text-white py-3 rounded-xl flex justify-center gap-2 font-bold text-lg shadow-lg transition-all cursor-pointer"
+                className="w-full  bg-emerald-600 hover:bg-emerald-700 border border-emerald-500/30 text-white py-2.5 sm:py-3 rounded-xl flex justify-center items-center gap-2 font-bold text-base sm:text-lg shadow-lg shadow-emerald-600/25 transition-all cursor-pointer"
               >
-                <Receipt /> Complete Sale
+                <Receipt size={18} /> Complete Sale
               </button>
             </div>
           </div>

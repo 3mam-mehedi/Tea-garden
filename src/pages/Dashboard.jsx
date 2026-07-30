@@ -46,12 +46,10 @@ export default function Dashboard({ onBack }) {
 
   const todayStr = getLocalDateString(new Date());
 
-  // আজকের ট্রানজেকশন ফিল্টার
   const todaysTransactionsRaw = transactions.filter(
     (t) => t && t.type === "income" && ((t.dateOnly && t.dateOnly === todayStr) || (t.date && t.date.includes(new Date().toLocaleDateString())))
   );
 
-  // অর্ডার গ্রুপগুলোকে ভেঙে আলাদা আইটেমে রূপান্তর (ফ্ল্যাটেন করা) যাতে টেবিলে প্রতিটি প্রোডাক্টের নাম ও পরিমাণ সঠিকভাবে দেখানো যায়
   const flattenedTodaysTransactions = [];
   todaysTransactionsRaw.forEach((t) => {
     if (!t) return;
@@ -95,27 +93,26 @@ export default function Dashboard({ onBack }) {
     return acc + profitPerUnit * parseInt(t.quantity || 1);
   }, 0);
 
-  // 🔴 Total Products কার্ড বাদ দিয়ে ৩টি কার্ড রাখা হলো
   const cards = [
     {
       id: "sales",
       title: "Today's Sales",
       value: `৳ ${todaysSales}`,
-      color: "bg-green-600",
+      color: "from-emerald-500 to-teal-600",
       icon: DollarSign,
     },
     {
       id: "orders",
       title: "Orders",
       value: todaysOrders.toString(),
-      color: "bg-blue-600",
+      color: "from-blue-500 to-indigo-600",
       icon: ShoppingCart,
     },
     {
       id: "profit",
       title: "Profit",
       value: `৳ ${Math.round(todaysProfit)}`,
-      color: "bg-purple-600",
+      color: "from-purple-500 to-pink-600",
       icon: TrendingUp,
     },
   ];
@@ -220,38 +217,37 @@ export default function Dashboard({ onBack }) {
   };
 
   return (
-    <div className="bg-[#F5F8F6] min-h-screen p-4 sm:p-8">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen p-3 sm:p-6 lg:p-8 font-sans antialiased pb-20">
+      
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
           {onBack && (
             <button
               onClick={onBack}
-              className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 hover:bg-gray-50 transition-all text-gray-700"
+              className="p-2.5 sm:p-3 bg-white/70 rounded-2xl shadow-sm border border-slate-200/60 hover:bg-white transition-all text-slate-700 shrink-0 cursor-pointer"
             >
-              <ArrowLeft size={20} />
+              <ArrowLeft size={18} />
             </button>
           )}
           <div>
-            <h1 className="text-3xl sm:text-4xl font-bold text-[#184E2E]">
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[#0b5d2a]">
               Dashboard Analytics
             </h1>
-            <p className="text-gray-500 mt-1">
-              Detailed breakdown of your business performance
-            </p>
-          </div>
+              </div>
         </div>
 
         <button
           onClick={downloadPDFReport}
-          className="flex items-center gap-2 bg-[#184E2E] hover:bg-[#0B5D2A] text-white px-6 py-3 rounded-2xl shadow-md transition-all font-semibold text-sm"
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl shadow-sm transition-all font-bold text-xs sm:text-sm cursor-pointer shadow-emerald-900/10 active:scale-95"
         >
-          <FileText size={18} />
-          Download PDF Report 📥
+          <FileText size={16} />
+          <span>Download PDF Report 📥</span>
         </button>
       </div>
 
-      {/* Metric Cards (Grid-cols-3) */}
-      <div className="grid md:grid-cols-3 gap-6">
+      {/* Metric Cards Grid (Glassmorphism & Fully Mobile Responsive) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
         {cards.map((item) => {
           const Icon = item.icon;
           const isSelected = selectedCard === item.id;
@@ -259,26 +255,28 @@ export default function Dashboard({ onBack }) {
             <div
               key={item.id}
               onClick={() => setSelectedCard(item.id)}
-              className={`bg-white rounded-3xl p-6 shadow-sm cursor-pointer border transition-all group ${
-                isSelected ? "border-emerald-500 ring-2 ring-emerald-500/20 shadow-md" : "border-gray-100 hover:border-emerald-200"
+              className={`bg-white/70  rounded-2xl sm:rounded-[24px] p-4 sm:p-5 shadow-sm cursor-pointer border transition-all duration-300 group hover:shadow-md hover:bg-white/90 ${
+                isSelected 
+                  ? "border-emerald-500/80 ring-2 ring-emerald-500/20 bg-white/90 shadow-md -translate-y-0.5" 
+                  : "border-slate-200/60 hover:-translate-y-0.5"
               }`}
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-gray-500 font-medium group-hover:text-[#184E2E] transition-colors text-sm">
+                  <p className="text-slate-400 font-semibold text-[11px] sm:text-xs uppercase tracking-wider group-hover:text-emerald-700 transition-colors">
                     {item.title}
                   </p>
-                  <h2 className="text-2xl sm:text-3xl font-bold mt-3 text-gray-800">
+                  <h2 className="text-2xl sm:text-3xl font-black mt-1 sm:mt-2 text-slate-800 tracking-tight">
                     {item.value}
                   </h2>
                 </div>
                 <div
-                  className={`${item.color} w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform`}
+                  className={`bg-gradient-to-br ${item.color} w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform duration-300 shrink-0`}
                 >
-                  <Icon size={24} />
+                  <Icon size={20} />
                 </div>
               </div>
-              <p className="text-xs text-emerald-600 font-medium mt-4 flex items-center gap-1">
+              <p className="text-[11px] sm:text-xs text-emerald-600 font-semibold mt-3 sm:mt-4 flex items-center gap-1">
                 {isSelected ? "Showing Details Below 👇" : "Click to view details 👆"}
               </p>
             </div>
@@ -287,14 +285,14 @@ export default function Dashboard({ onBack }) {
       </div>
 
       {/* Dynamic Details Section Based on Clicked Card */}
-      <div className="mt-8 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-gray-100">
-        <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-100">
-          <h3 className="text-lg sm:text-xl font-bold text-gray-800 capitalize">
+      <div className="mt-4 sm:mt-6 bg-white/70 rounded-2xl sm:rounded-[24px] p-4 sm:p-6 shadow-sm border border-slate-200/60">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-slate-200/60 gap-2">
+          <h3 className="text-base sm:text-xl font-extrabold text-slate-800 tracking-tight capitalize">
             {selectedCard === "sales" && "Today's Sales Breakdown"}
             {selectedCard === "orders" && "Today's Orders List"}
             {selectedCard === "profit" && "Today's Profit Breakdown"}
           </h3>
-          <span className="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl font-semibold border border-emerald-200">
+          <span className="text-[11px] sm:text-xs bg-emerald-500/10 text-emerald-800 px-3 py-1 rounded-full font-bold border border-emerald-500/20 shadow-sm">
             Today: {todayStr}
           </span>
         </div>
@@ -303,19 +301,19 @@ export default function Dashboard({ onBack }) {
         {(selectedCard === "sales" || selectedCard === "profit") && (
           <div>
             {flattenedTodaysTransactions.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">No records found for today.</p>
+              <p className="text-slate-400 text-center py-8 text-xs sm:text-sm font-medium">No records found for today.</p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full text-left border-collapse min-w-[500px] sm:min-w-full">
                   <thead>
-                    <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider">
-                      <th className="pb-3 font-semibold">Product Name</th>
-                      <th className="pb-3 font-semibold">Quantity</th>
-                      <th className="pb-3 font-semibold">{selectedCard === "profit" ? "Estimated Profit" : "Amount"}</th>
-                      <th className="pb-3 font-semibold">Date / Time</th>
+                    <tr className="border-b border-slate-200/60 text-[11px] sm:text-xs text-slate-400 uppercase tracking-wider">
+                      <th className="pb-3 font-bold">Product Name</th>
+                      <th className="pb-3 font-bold">Quantity</th>
+                      <th className="pb-3 font-bold">{selectedCard === "profit" ? "Estimated Profit" : "Amount"}</th>
+                      <th className="pb-3 font-bold">Date / Time</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50 text-sm">
+                  <tbody className="divide-y divide-slate-200/40 text-xs sm:text-sm">
                     {flattenedTodaysTransactions.map((t, idx) => {
                       if (!t) return null;
                       const matchedProduct = products.find((p) => p && p.name && t.title && p.name.toLowerCase() === t.title.toLowerCase());
@@ -327,13 +325,13 @@ export default function Dashboard({ onBack }) {
                       }
 
                       return (
-                        <tr key={idx} className="hover:bg-gray-50/50">
-                          <td className="py-3 font-medium text-gray-800">{t.title || "Unknown"}</td>
-                          <td className="py-3 text-gray-600">{t.quantity || 1} pcs</td>
-                          <td className="py-3 font-bold text-emerald-600">
+                        <tr key={idx} className="hover:bg-white/50 transition-colors">
+                          <td className="py-3 font-bold text-slate-700">{t.title || "Unknown"}</td>
+                          <td className="py-3 text-slate-600 font-medium">{t.quantity || 1} pcs</td>
+                          <td className="py-3 font-black text-emerald-600">
                             {selectedCard === "profit" ? `৳ ${Math.round(itemProfit)}` : `৳ ${t.amount || 0}`}
                           </td>
-                          <td className="py-3 text-gray-400 text-xs">{t.date || todayStr}</td>
+                          <td className="py-3 text-slate-400 text-[11px] sm:text-xs font-medium">{t.date || todayStr}</td>
                         </tr>
                       );
                     })}
@@ -348,18 +346,18 @@ export default function Dashboard({ onBack }) {
         {selectedCard === "orders" && (
           <div>
             {todaysTransactionsRaw.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">No orders found for today.</p>
+              <p className="text-slate-400 text-center py-8 text-xs sm:text-sm font-medium">No orders found for today.</p>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
+                <table className="w-full text-left border-collapse min-w-[500px] sm:min-w-full">
                   <thead>
-                    <tr className="border-b border-gray-100 text-xs text-gray-400 uppercase tracking-wider">
-                      <th className="pb-3 font-semibold">Order Details</th>
-                      <th className="pb-3 font-semibold">Total Amount</th>
-                      <th className="pb-3 font-semibold">Date / Time</th>
+                    <tr className="border-b border-slate-200/60 text-[11px] sm:text-xs text-slate-400 uppercase tracking-wider">
+                      <th className="pb-3 font-bold">Order Details</th>
+                      <th className="pb-3 font-bold">Total Amount</th>
+                      <th className="pb-3 font-bold">Date / Time</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-50 text-sm">
+                  <tbody className="divide-y divide-slate-200/40 text-xs sm:text-sm">
                     {todaysTransactionsRaw.map((t, idx) => {
                       if (!t) return null;
                       const orderSummary = t.items 
@@ -367,12 +365,12 @@ export default function Dashboard({ onBack }) {
                         : (t.title ? `${t.title} (${t.quantity || 1} pcs)` : "Single Order");
 
                       return (
-                        <tr key={idx} className="hover:bg-gray-50/50">
-                          <td className="py-3 font-medium text-gray-800">
-                            Order #{idx + 1}: <span className="text-gray-600 font-normal">{orderSummary}</span>
+                        <tr key={idx} className="hover:bg-white/50 transition-colors">
+                          <td className="py-3 font-bold text-slate-700">
+                            Order #{idx + 1}: <span className="text-slate-600 font-normal">{orderSummary}</span>
                           </td>
-                          <td className="py-3 font-bold text-emerald-600">৳ {t.amount || 0}</td>
-                          <td className="py-3 text-gray-400 text-xs">{t.date || todayStr}</td>
+                          <td className="py-3 font-black text-emerald-600">৳ {t.amount || 0}</td>
+                          <td className="py-3 text-slate-400 text-[11px] sm:text-xs font-medium">{t.date || todayStr}</td>
                         </tr>
                       );
                     })}

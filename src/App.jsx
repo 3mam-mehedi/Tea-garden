@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Navbar from "./components/Navbar";
+import Background from "./components/Background";
 
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
@@ -20,11 +21,12 @@ function ScrollToTop() {
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen relative bg-transparent">
+      <Background />
       <ScrollToTop />
       <Navbar />
 
-      <main className="lg:ml-[230px] p-6">
+      <main className="lg:ml-[230px] p-6 relative z-10">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />

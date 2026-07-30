@@ -13,7 +13,7 @@ export default function Products() {
   const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem("myProducts");
     return saved ? JSON.parse(saved) : [
-      { id: 1, name: "রং চা", category: "Tea", buy: 5, sell: 10, stock: 100, image: "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=300", isUnlimited: false }
+      { id: 1, name: "রং চা", category: "Tea", buy: 5, sell: 10, stock: 100, image: "/assets/products/rong cha.jpg", isUnlimited: false }
     ];
   });
 
@@ -116,7 +116,7 @@ export default function Products() {
           <div>
             <div className="relative mb-2 overflow-hidden rounded-xl aspect-square border border-white/80 bg-white/50 shadow-inner">
               <img 
-                src={item.image || "https://images.unsplash.com/photo-1515823064-d6e0c04616a7?w=300"} 
+                src={item.image || "/assets/products/rong cha.jpg"} 
                 className={`w-full h-full object-cover transition-transform duration-500 ${isOutOfStock ? "grayscale opacity-60" : "group-hover:scale-105"}`} 
                 alt={item.name} 
               />
@@ -190,11 +190,11 @@ export default function Products() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-100 via-teal-50 to-cyan-100 p-3 sm:p-6 text-gray-800">
+    <div className="p-3 sm:p-6 text-gray-800">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-700">Products Inventory</h1>
+          <h1 className="text-xl sm:text-3xl font-extrabold text-[#0b5d2a]">Products Inventory</h1>
           <button 
             onClick={() => { setEditId(null); setShowModal(true); }} 
             className="flex items-center gap-1.5 sm:gap-2 backdrop-blur-md bg-emerald-600/90 hover:bg-emerald-600 text-white px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 border border-emerald-400/40 transition-all text-xs sm:text-sm font-semibold"
