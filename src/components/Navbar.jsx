@@ -77,7 +77,7 @@ export default function Navbar() {
       <aside
         className={`
           fixed top-0 left-0 h-screen z-50
-          bg-[#0B5D2A] text-white flex flex-col justify-between overflow-hidden transition-all duration-300 ease-in-out
+          bg-[#0B5D2A] text-white flex flex-col overflow-hidden transition-all duration-300 ease-in-out
           ${collapse ? "w-[80px]" : "w-[230px]"}
           ${mobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0"}
         `}
@@ -90,7 +90,7 @@ export default function Navbar() {
         </div>
 
         {/* Top */}
-        <div className="relative z-10">
+        <div className="relative z-10 flex-1 overflow-y-auto">
           <div className="px-4 pt-6 pb-4 flex items-center justify-between">
             {(!collapse || isMobile) && (
               <div className="flex items-center gap-3">
@@ -138,7 +138,7 @@ export default function Navbar() {
         </div>
 
         {/* Bottom Section */}
-        <div className="relative z-10 px-3 pb-4">
+        <div className="relative z-10 px-3 mb-6 lg:mb-4">
           <div className={`rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-3 flex items-center ${collapse && !isMobile ? "justify-center p-2" : "gap-3"}`}>
             <div className="relative shrink-0">
               <img 
