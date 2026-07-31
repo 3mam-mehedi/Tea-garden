@@ -138,7 +138,7 @@ export default function Navbar() {
         </div>
 
         {/* Bottom Section */}
-        <div className="relative z-10 px-3 mb-6 lg:mb-4">
+        <div className="relative z-10 px-3 mb-12 lg:mb-4">
           <div className={`rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-3 flex items-center ${collapse && !isMobile ? "justify-center p-2" : "gap-3"}`}>
             <div className="relative shrink-0">
               <img 
