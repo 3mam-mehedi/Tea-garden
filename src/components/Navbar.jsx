@@ -25,7 +25,7 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // স্ক্রিন সাইজ চেক করার জন্য
+  // স্ক্রিন সাইজ চেক এবং মোবাইল মেনু ওপেন থাকলে বডি স্ক্রল বন্ধ রাখার জন্য
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
@@ -35,6 +35,17 @@ export default function Navbar() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [mobileOpen]);
 
   return (
     <>
@@ -133,14 +144,14 @@ export default function Navbar() {
               <img 
                 src="/assets/logo/tea.jpg" 
                 alt="profile" 
-                className={`rounded-full object-cover border-2 border-white/80 shadow-md ${collapse && !isMobile ? "w-9 h-9" : "w-10 h-10"}`} 
+                className={`rounded-full object-cover border-2 border-white/85 shadow-lg ${collapse && !isMobile ? "w-9 h-9" : "w-10 h-10"}`} 
               />
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#0B5D2A] rounded-full"></span>
             </div>
             {(!collapse || isMobile) && (
               <div className="flex-1 overflow-hidden">
-                <h4 className="font-semibold text-md truncate">চা বাগান</h4>
-                
+                <h4 className="font-semibold text-sm truncate">চা বাগান</h4>
+                <p className="text-[10px] text-white/70">Administrator</p>
               </div>
             )}
           </div>
