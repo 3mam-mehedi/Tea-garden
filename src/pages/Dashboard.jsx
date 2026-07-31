@@ -242,7 +242,7 @@ export default function Dashboard({ onBack }) {
           className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl shadow-sm transition-all font-bold text-xs sm:text-sm cursor-pointer shadow-emerald-900/10 active:scale-95"
         >
           <FileText size={16} />
-          <span>Download PDF Report 📥</span>
+          <span>Download PDF Report </span>
         </button>
       </div>
 
@@ -277,7 +277,7 @@ export default function Dashboard({ onBack }) {
                 </div>
               </div>
               <p className="text-[11px] sm:text-xs text-emerald-600 font-semibold mt-3 sm:mt-4 flex items-center gap-1">
-                {isSelected ? "Showing Details Below 👇" : "Click to view details 👆"}
+                {isSelected ? "Showing Details Below" : "Click to view details"}
               </p>
             </div>
           );

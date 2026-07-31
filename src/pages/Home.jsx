@@ -270,17 +270,17 @@ export default function Home() {
         </div>
 
         {/* Best Product Glass Banner */}
-        <div className="mt-4 sm:mt-5 bg-gradient-to-r from-emerald-800/90 via-teal-800/90 to-emerald-900/90  rounded-2xl sm:rounded-[28px] p-4 sm:p-6 shadow-sm text-white relative overflow-hidden flex flex-col sm:flex-row items-center justify-between border border-emerald-700/30 gap-4">
+        <div className="mt-4 sm:mt-5 bg-emerald-500/25 hover:bg-emerald-500/15  border-emerald-500/30 rounded-2xl sm:rounded-[28px] p-4 sm:p-6 shadow-sm relative overflow-hidden flex flex-col sm:flex-row items-center justify-between border  gap-4">
           <div className="z-10 text-center sm:text-left w-full sm:w-auto">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-[11px] sm:text-xs font-bold tracking-wide uppercase text-emerald-200 mb-2">
-              <Flame size={13} className="text-amber-300 fill-amber-300 animate-pulse" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-emerald-500/20 text-[11px] sm:text-xs font-bold tracking-wide uppercase text-emerald-700 mb-2">
+              <Flame size={18} className="text-amber-400 fill-amber-500 animate-pulse" />
               Best Product Today
             </div>
-            <h2 className="text-xl sm:text-3xl font-black tracking-tight text-white truncate max-w-full sm:max-w-md">
+            <h2 className="text-xl sm:text-3xl font-black tracking-tight text-rose-900 truncate max-w-full sm:max-w-md">
               {bestProductTitle}
             </h2>
-            <p className="text-emerald-100/90 text-xs sm:text-sm font-medium mt-1">
-              Over <span className="text-amber-300 font-bold underline decoration-amber-300/60">{maxQtyToday} Units</span> served to satisfied customers today!
+            <p className="text-emerald-700 text-xs sm:text-sm font-medium mt-1">
+              Over <span className="text-blue-600 font-bold underline decoration-blue-600/60">{maxQtyToday} Units</span> served to satisfied customers today!
             </p>
           </div>
 
@@ -306,7 +306,7 @@ export default function Home() {
             <h4 className="text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider">Low Stock Alerts</h4>
           </div>
           {lowStockItems.length === 0 ? (
-            <p className="text-xs text-emerald-600 font-semibold py-1">✨ All product stocks are in safe levels!</p>
+            <p className="text-xs text-emerald-600 font-semibold py-1">All product stocks are in safe levels!</p>
           ) : (
             <div className="flex flex-wrap gap-1.5 sm:gap-2 max-h-24 overflow-y-auto pr-1">
               {lowStockItems.map((item) => (
@@ -417,7 +417,7 @@ export default function Home() {
 
             <button 
               onClick={() => navigate("/dashboard")}
-              className="w-full mt-3 sm:mt-4 py-2.5 sm:py-3 bg-slate-900/90 hover:bg-slate-900 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition-all duration-200 flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+              className="w-full mt-3 sm:mt-4 py-2.5 sm:py-3 bg-rose-500/15 border border-rose-500/30 text-gray-800  hover:bg-rose-500/25 text-xs sm:text-sm font-bold rounded-xl shadow-sm transition-all duration-200 flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
             >
               <span>Detailed Report</span>
               <ArrowUpRight size={15} />
@@ -450,7 +450,7 @@ export default function Home() {
             </div>
             <button 
               onClick={() => navigate("/dashboard")} 
-              className="w-full mt-3 sm:mt-4 py-2.5 sm:py-3 bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition-all duration-200 active:scale-95 cursor-pointer shadow-emerald-900/10"
+              className="flex-1 sm:flex-none bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-900 px-6 sm:px-8 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/10 text-xs sm:text-sm cursor-pointer transition-all"
             >
               View All Products
             </button>

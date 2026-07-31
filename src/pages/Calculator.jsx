@@ -11,7 +11,7 @@ import {
   PackageCheck,
   Layers,
 } from "lucide-react";
-
+import { MdOutlineInventory2,MdPointOfSale } from "react-icons/md";
 export default function Calculator() {
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState(() => {
@@ -198,7 +198,7 @@ export default function Calculator() {
             {unlimitedProducts.length > 0 && (
               <div className="mb-4">
                 <div className="flex items-center gap-2 mb-2 px-1">
-                  <PackageCheck size={16} className="text-emerald-700" />
+                  <PackageCheck size={20} className="text-emerald-700" />
                   <p className="text-[11px] sm:text-xs font-bold text-emerald-800 uppercase tracking-wider">Always Available (Unlimited Stock)</p>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
@@ -217,7 +217,7 @@ export default function Calculator() {
                         />
                         <div className="overflow-hidden flex-1 min-w-0">
                           <h3 className="font-semibold text-[11px] sm:text-xs text-gray-800 group-hover:text-emerald-800 truncate flex items-center gap-1">
-                            {product.name} <Infinity size={10} className="text-emerald-700 shrink-0" />
+                            {product.name} <Infinity size={15} className="text-emerald-700 shrink-0" />
                           </h3>
                           <p className="text-emerald-700 font-bold text-[10px] sm:text-[11px]">৳ {product.price}</p>
                         </div>
@@ -230,7 +230,7 @@ export default function Calculator() {
             {/* Inventory Products */}
             <div>
               <div className="flex items-center gap-2 mb-2 px-1">
-                <Layers size={16} className="text-teal-700" />
+                <MdOutlineInventory2 size={20} className="text-teal-700" />
                 <p className="text-[11px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Inventory Items (Stock Managed)</p>
               </div>
               {inventoryProducts.length === 0 ? (
@@ -337,9 +337,9 @@ export default function Calculator() {
               </div>
               <button 
                 onClick={handleCompleteSale}
-                className="w-full  bg-emerald-600 hover:bg-emerald-700 border border-emerald-500/30 text-white py-2.5 sm:py-3 rounded-xl flex justify-center items-center gap-2 font-bold text-base sm:text-lg shadow-lg shadow-emerald-600/25 transition-all cursor-pointer"
+                className="w-full  bg-emerald-500/25 hover:bg-emerald-500/15 border border-emerald-500/30 text-emerald-900 py-2.5 sm:py-3 rounded-xl flex justify-center items-center gap-2 font-bold text-base sm:text-lg shadow-lg shadow-emerald-600/25 transition-all cursor-pointer"
               >
-                <Receipt size={18} /> Complete Sale
+                <MdPointOfSale size={18} /> Complete Sale
               </button>
             </div>
           </div>

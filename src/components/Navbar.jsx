@@ -83,7 +83,7 @@ export default function Navbar() {
           <div className="px-4 pt-6 pb-4 flex items-center justify-between">
             {(!collapse || isMobile) && (
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md shrink-0">
                   <SiCoffeescript className="text-[#0A5D2D]" size={24} />
                 </div>
                 <div>
@@ -95,7 +95,8 @@ export default function Navbar() {
 
             <button
               onClick={() => isMobile ? setMobileOpen(false) : setCollapse(!collapse)}
-              className="hidden lg:flex bg-white/10 p-2 rounded-xl hover:bg-white/20 transition-colors"
+              className="hidden lg:flex bg-white/10 p-2 rounded-xl hover:bg-white/20 transition-colors mx-auto lg:mx-0"
+              title={collapse ? "Expand Sidebar" : "Collapse Sidebar"}
             >
               {collapse ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
             </button>
@@ -113,8 +114,9 @@ export default function Navbar() {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                       isActive ? "bg-white text-[#0B5D2A] shadow-lg font-semibold" : "hover:bg-white/10"
-                    }`
+                    } ${collapse && !isMobile ? "justify-center px-0" : ""}`
                   }
+                  title={collapse && !isMobile ? item.title : ""}
                 >
                   <Icon size={20} className="shrink-0" />
                   {(!collapse || isMobile) && <span className="text-sm">{item.title}</span>}
@@ -126,16 +128,21 @@ export default function Navbar() {
 
         {/* Bottom Section */}
         <div className="relative z-10 px-3 pb-4">
-          <div className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-3">
-            <div className="flex items-center gap-3">
-              <img src="/assets/logo/tea.jpg" alt="profile" className="w-10 h-10 rounded-full object-cover" />
-              {(!collapse || isMobile) && (
-                <div className="flex-1 overflow-hidden">
-                  <h4 className="font-semibold text-sm truncate">Tea Garden</h4>
-                  <p className="text-xs text-white/70">Administrator</p>
-                </div>
-              )}
+          <div className={`rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-3 flex items-center ${collapse && !isMobile ? "justify-center p-2" : "gap-3"}`}>
+            <div className="relative shrink-0">
+              <img 
+                src="/assets/logo/tea.jpg" 
+                alt="profile" 
+                className={`rounded-full object-cover border-2 border-white/80 shadow-md ${collapse && !isMobile ? "w-9 h-9" : "w-10 h-10"}`} 
+              />
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#0B5D2A] rounded-full"></span>
             </div>
+            {(!collapse || isMobile) && (
+              <div className="flex-1 overflow-hidden">
+                <h4 className="font-semibold text-md truncate">চা বাগান</h4>
+                
+              </div>
+            )}
           </div>
         </div>
       </aside>

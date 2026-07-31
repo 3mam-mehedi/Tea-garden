@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, ArrowUpCircle, ArrowDownCircle, Wallet, Trash, FileText, Infinity, PackageCheck, Layers, ShoppingBag } from "lucide-react";
-
+import { Plus, Edit2, Trash2, Wallet, Trash, FileText, Infinity, PackageCheck, Layers, ShoppingBag } from "lucide-react";
+import { GiPayMoney,GiReceiveMoney,GiTakeMyMoney } from "react-icons/gi";
+import { MdOutlineInventory2 } from "react-icons/md";
 export default function Tali() {
   const [transactions, setTransactions] = useState(() => {
     const saved = localStorage.getItem("myTali");
@@ -250,6 +251,9 @@ export default function Tali() {
   return (
     <div className="min-h-[50vh] p-2 sm:p-6 w-full text-gray-800 max-w-full overflow-x-hidden">
       <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-[#0b5d2a]">Daily Tali & Accounts</h1>
+        </div> 
         {/* Dashboard */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 mb-4 sm:mb-6">
           <div className=" bg-emerald-500/15 border border-emerald-500/30 text-gray-800 p-3 sm:p-6 rounded-2xl shadow-xl">
@@ -270,7 +274,7 @@ export default function Tali() {
         {unlimitedProducts.length > 0 && (
           <div className=" bg-white/75 border border-white/80 p-3 sm:p-4 rounded-2xl shadow-xl mb-4">
             <div className="flex items-center gap-2 mb-2.5 px-1">
-              <PackageCheck size={16} className="text-emerald-700" />
+              <PackageCheck size={20} className="text-emerald-700" />
               <p className="text-[11px] sm:text-xs font-bold text-emerald-800 uppercase tracking-wider">Always Available (Unlimited Stock)</p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
@@ -283,7 +287,7 @@ export default function Tali() {
                   <img src={item.image} alt={item.name} className="w-7 h-7 sm:w-8 sm:h-8 object-cover rounded-lg border border-white/60 bg-gray-100 shrink-0" />
                   <div className="overflow-hidden min-w-0">
                     <span className="font-semibold text-[11px] sm:text-xs text-gray-800 group-hover:text-emerald-800 block truncate flex items-center gap-1">
-                      {item.name} <Infinity size={10} className="text-emerald-700 shrink-0" />
+                      {item.name} <Infinity size={15} className="text-emerald-700 shrink-0" />
                     </span>
                     <span className="text-[10px] text-emerald-700 font-bold">৳{item.price}</span>
                   </div>
@@ -296,7 +300,7 @@ export default function Tali() {
         {/* Section 2: Inventory Items */}
         <div className=" bg-white/75 border border-white/80 p-3 sm:p-4 rounded-2xl shadow-xl mb-4 sm:mb-6">
           <div className="flex items-center gap-2 mb-2.5 px-1">
-            <Layers size={16} className="text-teal-700" />
+            <MdOutlineInventory2 size={20} className="text-teal-700" />
             <p className="text-[11px] sm:text-xs font-bold text-gray-700 uppercase tracking-wider">Inventory Items (Stock Managed)</p>
           </div>
           {inventoryProducts.length === 0 ? (
@@ -330,7 +334,7 @@ export default function Tali() {
 
         {/* Direct Entry Form inside Tali */}
         <div className=" bg-white/75 border border-white/80 p-3 sm:p-4 rounded-2xl shadow-xl mb-4 sm:mb-6">
-          <h3 className="text-xs sm:text-sm font-bold text-emerald-700 mb-2">{editingId !== null ? "Edit Entry" : "Direct Sale / Expense Entry"}</h3>
+          <h3 className="text-xs sm:text-sm font-bold text-emerald-900 mb-2">{editingId !== null ? "Edit Entry" : "Direct Sale / Expense Entry"}</h3>
           <div className="flex flex-col sm:flex-row gap-2 mb-3">
             <input 
               type="text" 
@@ -368,9 +372,9 @@ export default function Tali() {
             <div className="flex gap-2">
               <button 
                 onClick={addTransaction} 
-                className="flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 border border-emerald-500/30 text-white px-6 sm:px-8 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 text-xs sm:text-sm cursor-pointer transition-all"
+                className="flex-1 sm:flex-none bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-900 px-6 sm:px-8 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/10 text-xs sm:text-sm cursor-pointer transition-all"
               >
-                <Plus size={16} /> {editingId !== null ? "Update" : "Add Entry"}
+                <Plus size={16} className="text-emerald-900" /> {editingId !== null ? "Update" : "Add Entry"}
               </button>
               {editingId !== null && (
                 <button 
@@ -387,7 +391,7 @@ export default function Tali() {
         {/* Transactions list (POS Orders shown as grouped separate cards) */}
         <div className=" bg-white/75 border border-white/80 rounded-2xl shadow-xl overflow-hidden mb-6">
           <div className="flex justify-between items-center p-3 border-b border-gray-200 bg-white/60">
-            <h3 className="font-bold text-xs sm:text-sm text-gray-800">Separate Sales Orders History</h3>
+            <h3 className="font-bold text-xs sm:text-sm text-emerald-900">Separate Sales Orders History</h3>
             <div className="flex gap-1.5 sm:gap-2">
               <button onClick={() => window.print()} className="flex items-center gap-1 text-[11px] sm:text-xs bg-sky-500/15 border border-sky-500/30 text-sky-700 px-2.5 py-1.5 rounded-xl font-semibold shadow-sm"><FileText size={13} /> Print</button>
               <button onClick={clearAllTransactions} className="flex items-center gap-1 text-[11px] sm:text-xs bg-rose-500/15 border border-rose-500/30 text-rose-700 px-2.5 py-1.5 rounded-xl font-semibold shadow-sm"><Trash size={13} /> Clear</button>
@@ -402,7 +406,7 @@ export default function Tali() {
                 {t.isOrderGroup ? (
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div className="flex items-start gap-2.5 sm:gap-3 min-w-0">
-                      <ShoppingBag className="text-emerald-700 mt-0.5 sm:mt-1 shrink-0" size={20} />
+                      <GiTakeMyMoney  className="text-emerald-700 mt-0.5 sm:mt-1 shrink-0" size={28} />
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-1.5 mb-1">
                           <span className="font-bold text-xs sm:text-sm text-emerald-800">POS Order Sale</span>
@@ -422,13 +426,13 @@ export default function Tali() {
                         <span className="font-bold text-xs sm:text-base text-emerald-700 block">+ ৳ {t.amount}</span>
                         <span className="text-[9px] sm:text-[10px] text-gray-500">Total Bill</span>
                       </div>
-                      <button onClick={() => deleteTransaction(t.id)} className="text-gray-500 hover:text-rose-600 p-1.5 rounded-lg hover:bg-rose-50 transition-all shrink-0" title="Delete Order"><Trash2 size={16} /></button>
+                      <button onClick={() => deleteTransaction(t.id)} className="text-rose-600 hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-50 transition-all shrink-0" title="Delete Order"><Trash2 size={16} /></button>
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-                      {t.type === "income" ? <ArrowUpCircle className="text-emerald-600 shrink-0" size={18} /> : <ArrowDownCircle className="text-rose-600 shrink-0" size={18} />}
+                      {t.type === "income" ? <GiReceiveMoney className="text-emerald-600 shrink-0" size={24} /> : <GiPayMoney className="text-rose-600 shrink-0" size={24} />}
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-1.5">
                           <p className="font-bold text-xs sm:text-sm text-gray-800 truncate">{t.title}</p>
@@ -443,7 +447,7 @@ export default function Tali() {
                       </span>
                       <div className="flex items-center gap-1">
                         <button onClick={() => startEdit(t)} className="text-gray-500 hover:text-sky-600 p-1" title="Edit"><Edit2 size={14} /></button>
-                        <button onClick={() => deleteTransaction(t.id)} className="text-gray-500 hover:text-rose-600 p-1" title="Delete"><Trash2 size={14} /></button>
+                        <button onClick={() => deleteTransaction(t.id)} className="text-rose-600 hover:text-rose-400 p-1" title="Delete"><Trash2 size={14} /></button>
                       </div>
                     </div>
                   </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, ImagePlus, ChevronLeft, ChevronRight, AlertCircle, Infinity, PackageCheck, Layers } from "lucide-react";
-
+import { MdOutlineInventory2 } from "react-icons/md";
 export default function Products() {
   const [showModal, setShowModal] = useState(false);
   const [preview, setPreview] = useState("");
@@ -8,6 +8,14 @@ export default function Products() {
   const [newProduct, setNewProduct] = useState({
     name: "", category: "", buy: "", sell: "", stock: "", image: "", isUnlimited: false,
   });
+
+  // প্রি-ডিফাইন্ড ক্যাটাগরি লিস্ট
+  const predefinedCategories = [
+    "Chips", "Soft Drinks", "Tea", "Coffee", "Bread", "Juice", "Water", "Biscuit", "Chocolate", "Chewing Gum"
+  ];
+
+  // কাস্টম ক্যাটাগরি মোড হ্যান্ডেল করার জন্য স্টেট
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
 
   // localStorage থেকে ডেটা লোড করা
   const [products, setProducts] = useState(() => {
@@ -79,6 +87,9 @@ export default function Products() {
 
   const openEditModal = (product) => {
     setEditId(product.id);
+    const categoryExists = predefinedCategories.includes(product.category);
+    setIsCustomCategory(!categoryExists && product.category !== "");
+    
     setNewProduct({
       ...product,
       isUnlimited: product.isUnlimited || false,
@@ -92,29 +103,30 @@ export default function Products() {
     setEditId(null);
     setNewProduct({ name: "", category: "", buy: "", sell: "", stock: "", image: "", isUnlimited: false });
     setPreview("");
+    setIsCustomCategory(false);
   };
 
   // প্রোডাক্টগুলোকে আলাদা করা
   const unlimitedProducts = products.filter(item => item.isUnlimited === true);
   const regularProducts = products.filter(item => item.isUnlimited !== true);
 
-  // রেন্ডারিং কার্ড কম্পোনেন্ট হেল্পার
-  const renderProductCard = (item, index) => {
+  // রেন্ডারিং কার্ড কম্পোনেন্ট হেল্পার (Glassmorphism & Mobile Optimized)
+  const renderProductCard = (item) => {
     const isUnlimitedStock = item.isUnlimited === true;
     const isOutOfStock = !isUnlimitedStock && (parseInt(item.stock) <= 0 || item.stock === "" || item.stock === null);
 
     return (
       <div 
         key={item.id} 
-        className={`p-[1px] rounded-2xl shadow-md transition-all duration-300 group flex flex-col ${
+        className={`rounded-2xl shadow-lg transition-all duration-300 group flex flex-col border ${
           isOutOfStock 
-            ? "bg-gradient-to-br from-gray-200 via-rose-200 to-rose-300 opacity-85" 
-            : "bg-gradient-to-br from-white via-emerald-200 to-emerald-400 hover:shadow-xl"
-        }`}
+            ? "bg-rose-50/40 border-rose-200/60 opacity-85" 
+            : "bg-white/40 hover:bg-white/60 border-white/60 hover:border-white hover:shadow-2xl"
+        } p-2 sm:p-2.5`}
       >
-        <div className={`backdrop-blur-2xl rounded-[15px] p-2 sm:p-2.5 h-full flex flex-col justify-between ${isOutOfStock ? "bg-gray-50/80" : "bg-white/75"}`}>
+        <div className="flex flex-col justify-between h-full">
           <div>
-            <div className="relative mb-2 overflow-hidden rounded-xl aspect-square border border-white/80 bg-white/50 shadow-inner">
+            <div className="relative mb-2 overflow-hidden rounded-xl aspect-square border border-white/50 bg-white/30 shadow-inner">
               <img 
                 src={item.image || "/assets/products/rong cha.jpg"} 
                 className={`w-full h-full object-cover transition-transform duration-500 ${isOutOfStock ? "grayscale opacity-60" : "group-hover:scale-105"}`} 
@@ -122,20 +134,20 @@ export default function Products() {
               />
               
               {/* Category Badge */}
-              <span className="absolute top-1 left-1 backdrop-blur-md bg-white/80 text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-white/60 shadow-sm truncate max-w-[65px]">
+              <span className="absolute top-1 left-1 bg-white/70 text-emerald-900 text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-white/40 shadow-sm truncate max-w-[65px]">
                 {item.category || "General"}
               </span>
 
               {/* Unlimited Stock Badge */}
               {isUnlimitedStock && (
-                <span className="absolute top-1 right-1 backdrop-blur-md bg-emerald-700/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-emerald-500/60 shadow-sm flex items-center gap-0.5">
-                  <Infinity size={10} /> Always
+                <span className="absolute top-1 right-1 bg-emerald-700/80 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-emerald-500/40 shadow-sm flex items-center gap-0.5">
+                  <Infinity size={15} /> Always
                 </span>
               )}
 
               {/* Out of Stock Overlay Badge */}
               {isOutOfStock && (
-                <div className="absolute inset-0 bg-rose-950/40 backdrop-blur-[1px] flex flex-col items-center justify-center p-1 text-center">
+                <div className="absolute inset-0 bg-rose-950/30 flex flex-col items-center justify-center p-1 text-center">
                   <span className="bg-rose-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded-md shadow-sm uppercase tracking-tighter flex items-center gap-0.5">
                     <AlertCircle size={10} /> Stock Out
                   </span>
@@ -145,7 +157,7 @@ export default function Products() {
 
             <h3 className="text-xs font-bold text-gray-900 truncate mb-1" title={item.name}>{item.name}</h3>
             
-            <div className="flex justify-between items-center text-[10px] text-gray-600 mb-1.5 bg-white/60 p-1 rounded-md border border-white/80 shadow-sm">
+            <div className="flex justify-between items-center text-[10px] text-gray-600 mb-1.5 bg-white/40 p-1 rounded-md border border-white/50 shadow-sm">
               <span>Buy: <strong className="text-gray-800">৳{item.buy}</strong></span>
               <span>
                 Stock:{" "}
@@ -167,19 +179,19 @@ export default function Products() {
           {/* Actions */}
           <div className="flex items-center justify-between pt-1.5 border-t border-gray-900/10">
             <div className="flex gap-0.5">
-              <button onClick={() => moveProduct(item.id, -1)} className="p-1 backdrop-blur-sm bg-white/80 hover:bg-white border border-white rounded-md text-gray-600 transition-colors shadow-sm" title="Move Left">
+              <button onClick={() => moveProduct(item.id, -1)} className="p-1  bg-white/60 hover:bg-white/90 border border-white/60 rounded-md text-gray-600 transition-colors shadow-sm" title="Move Left">
                 <ChevronLeft size={11}/>
               </button>
-              <button onClick={() => moveProduct(item.id, 1)} className="p-1 backdrop-blur-sm bg-white/80 hover:bg-white border border-white rounded-md text-gray-600 transition-colors shadow-sm" title="Move Right">
+              <button onClick={() => moveProduct(item.id, 1)} className="p-1  bg-white/60 hover:bg-white/90 border border-white/60 rounded-md text-gray-600 transition-colors shadow-sm" title="Move Right">
                 <ChevronRight size={11}/>
               </button>
             </div>
 
             <div className="flex gap-0.5">
-              <button onClick={() => openEditModal(item)} className="p-1 backdrop-blur-sm bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-700 rounded-md transition-colors shadow-sm" title="Edit">
+              <button onClick={() => openEditModal(item)} className="p-1 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-800 rounded-md transition-colors shadow-sm" title="Edit">
                 <Pencil size={11} />
               </button>
-              <button onClick={() => deleteProduct(item.id)} className="p-1 backdrop-blur-sm bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-700 rounded-md transition-colors shadow-sm" title="Delete">
+              <button onClick={() => deleteProduct(item.id)} className="p-1 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 text-rose-800 rounded-md transition-colors shadow-sm" title="Delete">
                 <Trash2 size={11} />
               </button>
             </div>
@@ -193,11 +205,13 @@ export default function Products() {
     <div className="p-3 sm:p-6 text-gray-800">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-3xl font-extrabold text-[#0b5d2a]">Products Inventory</h1>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-[#0b5d2a]">Products Inventory</h1>
+          
+          {/* Glassmorphism Add Product Button */}
           <button 
             onClick={() => { setEditId(null); setShowModal(true); }} 
-            className="flex items-center gap-1.5 sm:gap-2 backdrop-blur-md bg-emerald-600/90 hover:bg-emerald-600 text-white px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-emerald-600/20 border border-emerald-400/40 transition-all text-xs sm:text-sm font-semibold"
+            className="flex-1 sm:flex-none bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-900 px-6 sm:px-8 py-2.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/10 text-xs sm:text-sm cursor-pointer transition-all"
           >
             <Plus size={16} /> Add Product
           </button>
@@ -207,7 +221,7 @@ export default function Products() {
         {unlimitedProducts.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3 px-1">
-              <PackageCheck size={18} className="text-emerald-700" />
+              <PackageCheck size={20} className="text-emerald-700" />
               <h2 className="text-sm sm:text-base font-bold text-emerald-900">Always Available (Unlimited Stock)</h2>
               <span className="text-xs bg-emerald-200/60 text-emerald-800 px-2 py-0.5 rounded-full font-semibold">{unlimitedProducts.length}</span>
             </div>
@@ -221,7 +235,7 @@ export default function Products() {
         <div>
           {unlimitedProducts.length > 0 && regularProducts.length > 0 && (
             <div className="flex items-center gap-2 mb-3 px-1 pt-2">
-              <Layers size={18} className="text-teal-700" />
+              <MdOutlineInventory2 size={20} className="text-teal-700" />
               <h2 className="text-sm sm:text-base font-bold text-gray-800">Inventory Products (Stock Tracked)</h2>
               <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full font-semibold">{regularProducts.length}</span>
             </div>
@@ -238,13 +252,13 @@ export default function Products() {
 
         {/* Modal - Mobile Optimized */}
         {showModal && (
-          <div className="fixed inset-0 bg-emerald-950/40 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
+          <div className="fixed inset-0 bg-emerald-950/40  flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto">
             <div className="p-[1px] rounded-[25px] bg-gradient-to-br from-white via-emerald-300 to-emerald-500 w-full max-w-md shadow-2xl shadow-emerald-950/20 my-auto">
-              <div className="backdrop-blur-2xl bg-white/90 rounded-[24px] p-4 sm:p-5 text-gray-800">
+              <div className=" bg-white/90 rounded-[24px] p-4 sm:p-5 text-gray-800">
                 <h2 className="text-lg sm:text-xl font-bold mb-3 text-emerald-800">{editId ? "Edit Product" : "Add New Product"}</h2>
                 
                 <div className="flex justify-center mb-3">
-                  <label className="cursor-pointer border-2 border-dashed border-emerald-400 hover:border-emerald-500 rounded-2xl w-20 h-20 sm:w-24 sm:h-24 flex flex-col items-center justify-center text-emerald-600 backdrop-blur-sm bg-white/60 transition-all shadow-inner">
+                  <label className="cursor-pointer border-2 border-dashed border-emerald-400 hover:border-emerald-500 rounded-2xl w-20 h-20 sm:w-24 sm:h-24 flex flex-col items-center justify-center text-emerald-600  bg-white/60 transition-all shadow-inner">
                     <input type="file" hidden accept="image/*" onChange={handleImage} />
                     {preview ? <img src={preview} className="w-full h-full object-cover rounded-2xl" /> : <ImagePlus size={24} />}
                   </label>
@@ -255,16 +269,51 @@ export default function Products() {
                   placeholder="Name" 
                   value={newProduct.name} 
                   onChange={e => setNewProduct({...newProduct, name: e.target.value})} 
-                  className="w-full backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl mb-2.5 text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
+                  className="w-full bg-white/80 border border-white p-2.5 rounded-xl mb-2.5 text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
                 />
                 
-                <input 
-                  type="text" 
-                  placeholder="Category" 
-                  value={newProduct.category} 
-                  onChange={e => setNewProduct({...newProduct, category: e.target.value})} 
-                  className="w-full backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl mb-2.5 text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
-                />
+                {/* Category Selection with Custom Input Option */}
+                <div className="mb-2.5">
+                  {isCustomCategory ? (
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        placeholder="Type Custom Category" 
+                        value={newProduct.category} 
+                        onChange={e => setNewProduct({...newProduct, category: e.target.value})} 
+                        className="w-full bg-white/80 border border-white p-2.5 rounded-xl text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
+                      />
+                      <button 
+                        type="button" 
+                        onClick={() => { setIsCustomCategory(false); setNewProduct({...newProduct, category: ""}); }} 
+                        className="px-3 bg-gray-200 hover:bg-gray-300 text-xs rounded-xl font-medium text-gray-700 transition-colors"
+                      >
+                        List
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <select 
+                        value={newProduct.category} 
+                        onChange={e => {
+                          if (e.target.value === "custom_add_new") {
+                            setIsCustomCategory(true);
+                            setNewProduct({...newProduct, category: ""});
+                          } else {
+                            setNewProduct({...newProduct, category: e.target.value});
+                          }
+                        }}
+                        className="w-full bg-white/80 border border-white p-2.5 rounded-xl text-xs sm:text-sm text-gray-800 focus:outline-none focus:border-emerald-500 shadow-sm"
+                      >
+                        <option value="">Select Category</option>
+                        {predefinedCategories.map((cat, idx) => (
+                          <option key={idx} value={cat}>{cat}</option>
+                        ))}
+                        <option value="custom_add_new" className="font-bold text-emerald-700">+ Custom Category...</option>
+                      </select>
+                    </div>
+                  )}
+                </div>
                 
                 <div className="grid grid-cols-3 gap-2 mb-3">
                   <input 
@@ -272,14 +321,14 @@ export default function Products() {
                     placeholder="Buy" 
                     value={newProduct.buy} 
                     onChange={e => setNewProduct({...newProduct, buy: e.target.value})} 
-                    className="backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
+                    className="bg-white/80 border border-white p-2.5 rounded-xl text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
                   />
                   <input 
                     type="number" 
                     placeholder="Sell" 
                     value={newProduct.sell} 
                     onChange={e => setNewProduct({...newProduct, sell: e.target.value})} 
-                    className="backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
+                    className=" bg-white/80 border border-white p-2.5 rounded-xl text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm" 
                   />
                   <input 
                     type="number" 
@@ -287,7 +336,7 @@ export default function Products() {
                     disabled={newProduct.isUnlimited}
                     value={newProduct.isUnlimited ? "" : newProduct.stock} 
                     onChange={e => setNewProduct({...newProduct, stock: e.target.value})} 
-                    className={`backdrop-blur-sm bg-white/80 border border-white p-2.5 rounded-xl text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm ${newProduct.isUnlimited ? "opacity-50 cursor-not-allowed" : ""}`} 
+                    className={`bg-white/80 border border-white p-2.5 rounded-xl text-xs sm:text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-emerald-500 shadow-sm ${newProduct.isUnlimited ? "opacity-50 cursor-not-allowed" : ""}`} 
                   />
                 </div>
 
@@ -306,8 +355,8 @@ export default function Products() {
                 </div>
 
                 <div className="flex justify-end gap-2.5">
-                  <button onClick={closeModal} className="px-4 py-2 text-xs sm:text-sm backdrop-blur-sm bg-gray-200/80 hover:bg-gray-300 border border-white rounded-xl transition-all font-medium">Cancel</button>
-                  <button onClick={saveProduct} className="px-4 py-2 text-xs sm:text-sm backdrop-blur-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-600/20 transition-all font-medium">
+                  <button onClick={closeModal} className="px-4 py-2 text-xs sm:text-sm  bg-gray-200/80 hover:bg-gray-300 border border-white rounded-xl transition-all font-medium">Cancel</button>
+                  <button onClick={saveProduct} className="px-4 py-2 text-xs sm:text-sm  bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-600/20 transition-all font-medium">
                     {editId ? "Update" : "Save"}
                   </button>
                 </div>
