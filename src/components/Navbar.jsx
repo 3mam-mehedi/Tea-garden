@@ -1,9 +1,10 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
   Menu,
   X,
+  ExternalLink,
 } from "lucide-react";
 import { SiHomeassistantcommunitystore, SiCoffeescript } from "react-icons/si";
 import { AiOutlineDashboard } from "react-icons/ai";
@@ -24,6 +25,7 @@ export default function Navbar() {
   const [collapse, setCollapse] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isImageZoomed, setIsImageZoomed] = useState(false);
 
   // স্ক্রিন সাইজ চেক এবং মোবাইল মেনু ওপেন থাকলে বডি স্ক্রল বন্ধ রাখার জন্য
   useEffect(() => {
@@ -37,7 +39,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (mobileOpen) {
+    if (mobileOpen || isImageZoomed) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
@@ -45,7 +47,10 @@ export default function Navbar() {
     return () => {
       document.body.style.overflow = "unset";
     };
-  }, [mobileOpen]);
+  }, [mobileOpen, isImageZoomed]);
+
+  const profileImageUrl = "/assets/logo/tea.png";
+  const googleMapUrl = "https://www.google.com/maps/place/%E0%A6%9A%E0%A6%BE+%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%BE%E0%A6%6E/@23.4641434,90.2865942,19z/data=!4m14!1m7!3m6!1s0x37559f0046545ee7:0x314ab1ead61fc9f4!2z4Kaa4Ka-IOCmrOCmvuCml-CmvuCmqA!8m2!3d23.4641814!4d90.2865936!16s%2Fg%2F11zg1dg487!3m5!1s0x37559f0046545ee7:0x314ab1ead61fc9f4!8m2!3d23.4641814!4d90.2865936!16s%2Fg%2F11zg1dg487?entry=ttu&g_ep=EgoyMDI2MDcyOS4wIKXMDSoASAFQAw%3D%3D";
 
   return (
     <>
@@ -93,15 +98,30 @@ export default function Navbar() {
         <div className="relative z-10 flex-1 overflow-y-auto">
           <div className="px-4 pt-6 pb-4 flex items-center justify-between">
             {(!collapse || isMobile) && (
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md shrink-0">
+              <Link 
+                to="/" 
+                onClick={() => isMobile && setMobileOpen(false)}
+                className="flex items-center gap-3 group cursor-pointer"
+              >
+                <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md shrink-0 transition-transform group-hover:scale-105">
                   <SiCoffeescript className="text-[#0A5D2D]" size={24} />
                 </div>
                 <div>
-                  <h2 className="font-bold text-lg">Tea Garden</h2>
+                  <h2 className="font-bold text-lg group-hover:text-emerald-200 transition-colors">Tea Garden</h2>
                   <p className="text-[10px] text-white/70">Tea Management</p>
                 </div>
-              </div>
+              </Link>
+            )}
+
+            {/* When collapsed, clicking the top icon/logo can also go to home */}
+            {collapse && !isMobile && (
+              <Link 
+                to="/" 
+                className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md shrink-0 mx-auto hover:scale-105 transition-transform"
+                title="Homepage"
+              >
+                <SiCoffeescript className="text-[#0A5D2D]" size={24} />
+              </Link>
             )}
 
             <button
@@ -141,22 +161,63 @@ export default function Navbar() {
         <div className="relative z-10 px-3 mb-16 lg:mb-4">
           <div className={`rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-3 flex items-center ${collapse && !isMobile ? "justify-center p-2" : "gap-3"}`}>
             <div className="relative shrink-0">
+              {/* Image with Zoom Trigger on Click */}
               <img 
-                src="/assets/logo/tea.jpg" 
+                src={profileImageUrl}
                 alt="profile" 
-                className={`rounded-full object-cover border-2 border-white/85 shadow-lg ${collapse && !isMobile ? "w-9 h-9" : "w-10 h-10"}`} 
+                onClick={() => setIsImageZoomed(true)}
+                className={`rounded-full object-cover border-2 border-white/85 shadow-lg cursor-pointer transition-transform duration-200 hover:scale-105 ${collapse && !isMobile ? "w-9 h-9" : "w-10 h-10"}`} 
+                title="Click to zoom image"
               />
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#0B5D2A] rounded-full"></span>
+              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#0B5D2A] rounded-full pointer-events-none"></span>
             </div>
+            
+            {/* Clickable Text to Google Map */}
             {(!collapse || isMobile) && (
-              <div className="flex-1 overflow-hidden">
-                <h4 className="font-semibold text-sm truncate">চা বাগান</h4>
-                <p className="text-[10px] text-white/70">Administrator</p>
-              </div>
+              <a 
+                href={googleMapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 overflow-hidden group cursor-pointer text-left block"
+                title="View on Google Maps"
+              >
+                <div className="flex items-center gap-1">
+                  <h4 className="font-semibold text-sm truncate group-hover:underline text-white">চা বাগান</h4>
+                  <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity text-emerald-300 shrink-0" />
+                </div>
+                <p className="text-[10px] text-white/70 group-hover:text-white/90 transition-colors">Administrator</p>
+              </a>
             )}
           </div>
         </div>
       </aside>
+
+      {/* Image Zoom Modal with Animation */}
+      {isImageZoomed && (
+        <div 
+          onClick={() => setIsImageZoomed(false)}
+          className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300 animate-fadeIn"
+        >
+          <div className="relative max-w-lg w-full flex flex-col items-center">
+            {/* Close Button */}
+            <button 
+              onClick={() => setIsImageZoomed(false)}
+              className="absolute -top-12 right-0 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-colors"
+            >
+              <X size={24} />
+            </button>
+            
+            {/* Zoomed Image */}
+            <img 
+              src={profileImageUrl} 
+              alt="Zoomed profile" 
+              className="max-h-[80vh] max-w-full rounded-2xl shadow-2xl border-4 border-white/20 object-contain animate-scaleUp"
+              onClick={(e) => e.stopPropagation()} 
+            />
+            <p className="text-white/80 mt-4 text-sm font-medium">চা বাগান Administrator</p>
+          </div>
+        </div>
+      )}
     </>
   );
 }
