@@ -1,10 +1,9 @@
-
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBGcazBGjqgMwEnbKeDZQlo3SlpkVnZ4-A",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "pos-software-18984.firebaseapp.com",
   projectId: "pos-software-18984",
   storageBucket: "pos-software-18984.firebasestorage.app",
