@@ -1,98 +1,317 @@
 import { useState, useEffect } from "react";
-import { DollarSign, ShoppingCart, TrendingUp, ArrowLeft, FileText } from "lucide-react";
+import {
+  DollarSign,
+  ShoppingCart,
+  TrendingUp,
+  ArrowLeft,
+  FileText,
+} from "lucide-react";
+
+import { db } from "../firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 
 export default function Dashboard({ onBack }) {
   const [transactions, setTransactions] = useState([]);
   const [products, setProducts] = useState([]);
   const [selectedCard, setSelectedCard] = useState("sales");
 
-  const loadData = () => {
-    const savedTali = localStorage.getItem("myTali");
-    if (savedTali) {
-      try {
-        setTransactions(JSON.parse(savedTali));
-      } catch (e) {
-        setTransactions([]);
-      }
-    }
-
-    const savedProducts = localStorage.getItem("myProducts");
-    if (savedProducts) {
-      try {
-        setProducts(JSON.parse(savedProducts));
-      } catch (e) {
-        setProducts([]);
-      }
-    }
-  };
-
+  // ==========================================
+  // FIREBASE REALTIME DATA
+  // ==========================================
   useEffect(() => {
-    loadData();
-    window.addEventListener("storage", loadData);
-    window.addEventListener("productStockUpdated", loadData);
+    const unsubscribeTransactions = onSnapshot(
+      collection(db, "transactions"),
+      (snapshot) => {
+        setTransactions(
+          snapshot.docs.map((document) => ({
+            id: document.id,
+            ...document.data(),
+          }))
+        );
+      },
+      (error) => {
+        console.error("Transactions load error:", error);
+      }
+    );
+
+    const unsubscribeProducts = onSnapshot(
+      collection(db, "products"),
+      (snapshot) => {
+        setProducts(
+          snapshot.docs.map((document) => ({
+            id: document.id,
+            ...document.data(),
+          }))
+        );
+      },
+      (error) => {
+        console.error("Products load error:", error);
+      }
+    );
 
     return () => {
-      window.removeEventListener("storage", loadData);
-      window.removeEventListener("productStockUpdated", loadData);
+      unsubscribeTransactions();
+      unsubscribeProducts();
     };
   }, []);
 
+  // ==========================================
+  // DATE HELPERS
+  // ==========================================
   const getLocalDateString = (dateObj) => {
     const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getDate()).padStart(2, "0");
+
     return `${year}-${month}-${day}`;
   };
 
-  const todayStr = getLocalDateString(new Date());
+  // Firestore Timestamp / ISO string / old date string
+  const getTransactionDateTime = (transaction) => {
+    if (!transaction) return null;
 
-  const todaysTransactionsRaw = transactions.filter(
-    (t) => t && t.type === "income" && ((t.dateOnly && t.dateOnly === todayStr) || (t.date && t.date.includes(new Date().toLocaleDateString())))
-  );
+    // New records: Firestore Timestamp
+    if (
+      transaction.createdAt &&
+      typeof transaction.createdAt.toDate === "function"
+    ) {
+      return transaction.createdAt.toDate();
+    }
 
+    // ISO date string fallback
+    if (
+      typeof transaction.createdAt === "string" &&
+      transaction.createdAt.trim()
+    ) {
+      const parsedCreatedAt = new Date(transaction.createdAt);
+
+      if (!Number.isNaN(parsedCreatedAt.getTime())) {
+        return parsedCreatedAt;
+      }
+    }
+
+    // Older records: date string with time
+    // Example: 11/3/2026 at 04:30 PM
+    const dateText = transaction.date;
+
+    if (typeof dateText !== "string") return null;
+
+    const match = dateText.match(
+      /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+at\s+(\d{1,2}):(\d{2})\s*(AM|PM)$/i
+    );
+
+    if (match) {
+      const [, month, day, year, hourText, minuteText, periodText] = match;
+
+      let hour = Number(hourText);
+      const minute = Number(minuteText);
+      const period = periodText.toUpperCase();
+
+      if (
+        Number(month) < 1 ||
+        Number(month) > 12 ||
+        Number(day) < 1 ||
+        Number(day) > 31 ||
+        hour < 1 ||
+        hour > 12 ||
+        minute < 0 ||
+        minute > 59
+      ) {
+        return null;
+      }
+
+      if (period === "AM" && hour === 12) hour = 0;
+      if (period === "PM" && hour !== 12) hour += 12;
+
+      const parsedDate = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        hour,
+        minute
+      );
+
+      if (
+        parsedDate.getFullYear() !== Number(year) ||
+        parsedDate.getMonth() !== Number(month) - 1 ||
+        parsedDate.getDate() !== Number(day)
+      ) {
+        return null;
+      }
+
+      return parsedDate;
+    }
+
+    // Another possible old format:
+    // YYYY-MM-DD at 04:30 PM
+    const alternateMatch = dateText.match(
+      /^(\d{4})-(\d{1,2})-(\d{1,2})\s+at\s+(\d{1,2}):(\d{2})\s*(AM|PM)$/i
+    );
+
+    if (alternateMatch) {
+      const [, year, month, day, hourText, minuteText, periodText] =
+        alternateMatch;
+
+      let hour = Number(hourText);
+      const minute = Number(minuteText);
+      const period = periodText.toUpperCase();
+
+      if (
+        Number(month) < 1 ||
+        Number(month) > 12 ||
+        Number(day) < 1 ||
+        Number(day) > 31 ||
+        hour < 1 ||
+        hour > 12 ||
+        minute < 0 ||
+        minute > 59
+      ) {
+        return null;
+      }
+
+      if (period === "AM" && hour === 12) hour = 0;
+      if (period === "PM" && hour !== 12) hour += 12;
+
+      const parsedDate = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+        hour,
+        minute
+      );
+
+      if (
+        parsedDate.getFullYear() !== Number(year) ||
+        parsedDate.getMonth() !== Number(month) - 1 ||
+        parsedDate.getDate() !== Number(day)
+      ) {
+        return null;
+      }
+
+      return parsedDate;
+    }
+
+    return null;
+  };
+
+  // ==========================================
+  // REPORT PERIOD: 3 PM TO NEXT DAY 7 AM
+  // ==========================================
+  const now = new Date();
+
+  const reportStart = new Date(now);
+  reportStart.setHours(15, 0, 0, 0);
+
+  // Before 3 PM, the active report started yesterday.
+  if (now.getHours() < 15) {
+    reportStart.setDate(reportStart.getDate() - 1);
+  }
+
+  const reportEnd = new Date(reportStart);
+  reportEnd.setDate(reportEnd.getDate() + 1);
+  reportEnd.setHours(7, 0, 0, 0);
+
+  const todayStr = getLocalDateString(reportStart);
+
+  const reportDateLabel = reportStart.toLocaleDateString();
+
+  // ==========================================
+  // FILTER TRANSACTIONS
+  // 3:00 PM inclusive, next day 7:00 AM exclusive
+  // ==========================================
+  const todaysTransactionsRaw = transactions.filter((transaction) => {
+    if (!transaction || transaction.type !== "income") {
+      return false;
+    }
+
+    const transactionDate = getTransactionDateTime(transaction);
+
+    if (!transactionDate) {
+      return false;
+    }
+
+    return (
+      transactionDate >= reportStart &&
+      transactionDate < reportEnd
+    );
+  });
+
+  // ==========================================
+  // FLATTEN TRANSACTIONS FOR PRODUCT REPORTS
+  // ==========================================
   const flattenedTodaysTransactions = [];
-  todaysTransactionsRaw.forEach((t) => {
-    if (!t) return;
-    if (t.isOrderGroup && Array.isArray(t.items)) {
-      t.items.forEach((item) => {
+
+  todaysTransactionsRaw.forEach((transaction) => {
+    if (!transaction) return;
+
+    if (
+      transaction.isOrderGroup &&
+      Array.isArray(transaction.items)
+    ) {
+      transaction.items.forEach((item) => {
         flattenedTodaysTransactions.push({
-          title: item.name,
-          amount: (item.price || 0) * (item.qty || 1),
-          quantity: item.qty || 1,
-          date: t.date || todayStr
+          title: item.name || "Unknown",
+          amount:
+            (Number(item.price) || 0) *
+            (Number(item.qty) || 1),
+          quantity: Number(item.qty) || 1,
+          date: transaction.date || todayStr,
         });
       });
     } else {
       flattenedTodaysTransactions.push({
-        title: t.title || "Unknown",
-        amount: t.amount || 0,
-        quantity: t.quantity || 1,
-        date: t.date || todayStr
+        title: transaction.title || "Unknown",
+        amount: Number(transaction.amount) || 0,
+        quantity: Number(transaction.quantity) || 1,
+        date: transaction.date || todayStr,
       });
     }
   });
 
-  const todaysSales = todaysTransactionsRaw.reduce((acc, t) => acc + (t.amount || 0), 0);
+  // ==========================================
+  // SALES / ORDERS / PROFIT
+  // ==========================================
+  const todaysSales = todaysTransactionsRaw.reduce(
+    (total, transaction) =>
+      total + (Number(transaction.amount) || 0),
+    0
+  );
+
   const todaysOrders = todaysTransactionsRaw.length;
 
-  const todaysProfit = flattenedTodaysTransactions.reduce((acc, t) => {
-    if (!t || !t.title) return acc;
+  const calculateItemProfit = (transactionItem) => {
+    if (!transactionItem || !transactionItem.title) return 0;
 
     const matchedProduct = products.find(
-      (p) => p && p.name && t.title && p.name.toLowerCase() === t.title.toLowerCase()
+      (product) =>
+        product &&
+        product.name &&
+        product.name.toLowerCase() ===
+          transactionItem.title.toLowerCase()
     );
 
-    let profitPerUnit = 0;
-    if (matchedProduct) {
-      const sell = parseFloat(matchedProduct.sell) || 0;
-      const buy = parseFloat(matchedProduct.buy) || 0;
-      profitPerUnit = sell - buy;
-    } else {
-      profitPerUnit = ((t.amount || 0) / parseInt(t.quantity || 1)) * 0.3;
-    }
-    return acc + profitPerUnit * parseInt(t.quantity || 1);
-  }, 0);
+    const quantity = Number(transactionItem.quantity) || 1;
 
+    if (matchedProduct) {
+      const sell = Number(matchedProduct.sell) || 0;
+      const buy = Number(matchedProduct.buy) || 0;
+
+      return (sell - buy) * quantity;
+    }
+
+    // Fallback estimate when product is unavailable.
+    return (Number(transactionItem.amount) || 0) * 0.3;
+  };
+
+  const todaysProfit = flattenedTodaysTransactions.reduce(
+    (total, transactionItem) =>
+      total + calculateItemProfit(transactionItem),
+    0
+  );
+
+  // ==========================================
+  // DASHBOARD CARDS
+  // ==========================================
   const cards = [
     {
       id: "sales",
@@ -117,108 +336,209 @@ export default function Dashboard({ onBack }) {
     },
   ];
 
+  // ==========================================
+  // PDF REPORT
+  // ==========================================
   const downloadPDFReport = () => {
-    const printWindow = window.open('', '_blank');
-    
+    const printWindow = window.open("", "_blank");
+
+    if (!printWindow) {
+      alert("Please allow pop-ups to download the report.");
+      return;
+    }
+
     let reportTitle = "";
     let tableHeaders = "";
     let tableRows = "";
 
     if (selectedCard === "sales") {
-      reportTitle = "Today's Sales Report";
-      tableHeaders = `<th>Product Name</th><th>Quantity</th><th>Amount</th><th>Date / Time</th>`;
-      tableRows = flattenedTodaysTransactions.length === 0 ? 
-        '<tr><td colspan="4" style="text-align:center;">No records found for today.</td></tr>' : 
-        flattenedTodaysTransactions.map(t => `
-          <tr>
-            <td>${t?.title || "Unknown"}</td>
-            <td>${t?.quantity || 1} pcs</td>
-            <td class="amount">৳ ${t?.amount || 0}</td>
-            <td>${t?.date || todayStr}</td>
-          </tr>
-        `).join('');
+      reportTitle = "Sales Report";
+
+      tableHeaders = `
+        <th>Product Name</th>
+        <th>Quantity</th>
+        <th>Amount</th>
+        <th>Date / Time</th>
+      `;
+
+      tableRows =
+        flattenedTodaysTransactions.length === 0
+          ? '<tr><td colspan="4" style="text-align:center;">No records found for this period.</td></tr>'
+          : flattenedTodaysTransactions
+              .map(
+                (item) => `
+                  <tr>
+                    <td>${item.title || "Unknown"}</td>
+                    <td>${item.quantity || 1} pcs</td>
+                    <td class="amount">৳ ${item.amount || 0}</td>
+                    <td>${item.date || todayStr}</td>
+                  </tr>
+                `
+              )
+              .join("");
     } else if (selectedCard === "orders") {
-      reportTitle = "Today's Orders Report";
-      tableHeaders = `<th>Order ID / Details</th><th>Total Amount</th><th>Date / Time</th>`;
-      tableRows = todaysTransactionsRaw.length === 0 ? 
-        '<tr><td colspan="3" style="text-align:center;">No orders found for today.</td></tr>' : 
-        todaysTransactionsRaw.map((t, idx) => `
-          <tr>
-            <td>Order #${idx + 1} (${t.items ? t.items.map(i => `${i.name} (${i.qty}x)`).join(', ') : (t.title || "Order")})</td>
-            <td class="amount">৳ ${t?.amount || 0}</td>
-            <td>${t?.date || todayStr}</td>
-          </tr>
-        `).join('');
+      reportTitle = "Orders Report";
+
+      tableHeaders = `
+        <th>Order ID / Details</th>
+        <th>Total Amount</th>
+        <th>Date / Time</th>
+      `;
+
+      tableRows =
+        todaysTransactionsRaw.length === 0
+          ? '<tr><td colspan="3" style="text-align:center;">No orders found for this period.</td></tr>'
+          : todaysTransactionsRaw
+              .map((transaction, index) => {
+                const details = Array.isArray(transaction.items)
+                  ? transaction.items
+                      .map(
+                        (item) =>
+                          `${item.name} (${item.qty}x)`
+                      )
+                      .join(", ")
+                  : transaction.title || "Order";
+
+                return `
+                  <tr>
+                    <td>Order #${index + 1} (${details})</td>
+                    <td class="amount">৳ ${transaction.amount || 0}</td>
+                    <td>${transaction.date || todayStr}</td>
+                  </tr>
+                `;
+              })
+              .join("");
     } else if (selectedCard === "profit") {
-      reportTitle = "Today's Profit Report";
-      tableHeaders = `<th>Product Name</th><th>Quantity</th><th>Estimated Profit</th><th>Date / Time</th>`;
-      tableRows = flattenedTodaysTransactions.length === 0 ? 
-        '<tr><td colspan="4" style="text-align:center;">No records found for today.</td></tr>' : 
-        flattenedTodaysTransactions.map(t => {
-          if (!t) return '';
-          const matchedProduct = products.find((p) => p && p.name && t.title && p.name.toLowerCase() === t.title.toLowerCase());
-          let itemProfit = 0;
-          if (matchedProduct) {
-            itemProfit = (parseFloat(matchedProduct.sell || 0) - parseFloat(matchedProduct.buy || 0)) * parseInt(t.quantity || 1);
-          } else {
-            itemProfit = (t.amount || 0) * 0.3;
-          }
-          return `
-            <tr>
-              <td>${t.title || "Unknown"}</td>
-              <td>${t.quantity || 1} pcs</td>
-              <td class="amount" style="color: #7c3aed;">৳ ${Math.round(itemProfit)}</td>
-              <td>${t.date || todayStr}</td>
-            </tr>
-          `;
-        }).join('');
+      reportTitle = "Profit Report";
+
+      tableHeaders = `
+        <th>Product Name</th>
+        <th>Quantity</th>
+        <th>Estimated Profit</th>
+        <th>Date / Time</th>
+      `;
+
+      tableRows =
+        flattenedTodaysTransactions.length === 0
+          ? '<tr><td colspan="4" style="text-align:center;">No records found for this period.</td></tr>'
+          : flattenedTodaysTransactions
+              .map((item) => {
+                const itemProfit = calculateItemProfit(item);
+
+                return `
+                  <tr>
+                    <td>${item.title || "Unknown"}</td>
+                    <td>${item.quantity || 1} pcs</td>
+                    <td class="amount" style="color:#7c3aed;">
+                      ৳ ${Math.round(itemProfit)}
+                    </td>
+                    <td>${item.date || todayStr}</td>
+                  </tr>
+                `;
+              })
+              .join("");
     }
 
+    const selectedCardTitle =
+      cards.find((card) => card.id === selectedCard)?.title || "";
+
     const htmlContent = `
+      <!DOCTYPE html>
       <html>
         <head>
-          <title>${reportTitle} - ${todayStr}</title>
+          <meta charset="UTF-8" />
+          <title>${reportTitle} - ${reportDateLabel}</title>
           <style>
-            body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
-            h2 { text-align: center; color: #184E2E; }
-            .summary { margin-bottom: 20px; font-size: 14px; background: #f5f8f6; padding: 15px; border-radius: 8px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 12px; }
-            th { background-color: #184E2E; color: white; }
-            .amount { color: #184E2E; font-weight: bold; }
+            body {
+              font-family: Arial, sans-serif;
+              padding: 20px;
+              color: #333;
+            }
+            h2 {
+              text-align: center;
+              color: #184E2E;
+            }
+            .summary {
+              margin-bottom: 20px;
+              font-size: 14px;
+              background: #f5f8f6;
+              padding: 15px;
+              border-radius: 8px;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 10px;
+            }
+            th, td {
+              border: 1px solid #ddd;
+              padding: 8px;
+              text-align: left;
+              font-size: 12px;
+            }
+            th {
+              background-color: #184E2E;
+              color: white;
+            }
+            .amount {
+              color: #184E2E;
+              font-weight: bold;
+            }
           </style>
         </head>
         <body>
           <h2>${reportTitle}</h2>
+
           <div class="summary">
-            <p><strong>Report Date:</strong> ${todayStr}</p>
-            <p><strong>Active View:</strong> ${cards.find(c => c.id === selectedCard)?.title}</p>
-            ${selectedCard === 'sales' ? `<p><strong>Total Sales:</strong> ৳ ${todaysSales}</p>` : ''}
-            ${selectedCard === 'orders' ? `<p><strong>Total Orders:</strong> ${todaysOrders}</p>` : ''}
-            ${selectedCard === 'profit' ? `<p><strong>Total Estimated Profit:</strong> ৳ ${Math.round(todaysProfit)}</p>` : ''}
+            <p><strong>Report Date:</strong> ${reportDateLabel}</p>
+            <p><strong>Report Period:</strong> 3:00 PM – 7:00 AM</p>
+            <p><strong>Active View:</strong> ${selectedCardTitle}</p>
+
+            ${
+              selectedCard === "sales"
+                ? `<p><strong>Total Sales:</strong> ৳ ${todaysSales}</p>`
+                : ""
+            }
+
+            ${
+              selectedCard === "orders"
+                ? `<p><strong>Total Orders:</strong> ${todaysOrders}</p>`
+                : ""
+            }
+
+            ${
+              selectedCard === "profit"
+                ? `<p><strong>Total Estimated Profit:</strong> ৳ ${Math.round(todaysProfit)}</p>`
+                : ""
+            }
           </div>
-          
+
           <table>
             <thead>
               <tr>${tableHeaders}</tr>
             </thead>
-            <tbody>
-              ${tableRows}
-            </tbody>
+            <tbody>${tableRows}</tbody>
           </table>
+
           <script>
-            window.onload = function() { window.print(); }
+            window.onload = function() {
+              window.print();
+            };
           </script>
         </body>
       </html>
     `;
+
     printWindow.document.write(htmlContent);
     printWindow.document.close();
   };
 
+  // ==========================================
+  // UI — PRESERVED FROM YOUR ORIGINAL VERSION
+  // ==========================================
   return (
     <div className="min-h-screen p-3 sm:p-6 lg:p-8 font-sans antialiased pb-20">
-      
+
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
         <div className="flex items-center gap-3 sm:gap-4 w-full sm:w-auto">
@@ -230,11 +550,12 @@ export default function Dashboard({ onBack }) {
               <ArrowLeft size={18} />
             </button>
           )}
+
           <div>
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-[#0b5d2a]">
               Dashboard Analytics
             </h1>
-              </div>
+          </div>
         </div>
 
         <button
@@ -242,22 +563,23 @@ export default function Dashboard({ onBack }) {
           className="w-full sm:w-auto flex items-center justify-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-2xl shadow-sm transition-all font-bold text-xs sm:text-sm cursor-pointer shadow-emerald-900/10 active:scale-95"
         >
           <FileText size={16} />
-          <span>Download PDF Report </span>
+          <span>Download PDF Report</span>
         </button>
       </div>
 
-      {/* Metric Cards Grid (Glassmorphism & Fully Mobile Responsive) */}
+      {/* Metric Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
         {cards.map((item) => {
           const Icon = item.icon;
           const isSelected = selectedCard === item.id;
+
           return (
             <div
               key={item.id}
               onClick={() => setSelectedCard(item.id)}
-              className={`bg-white/70  rounded-2xl sm:rounded-[24px] p-4 sm:p-5 shadow-sm cursor-pointer border transition-all duration-300 group hover:shadow-md hover:bg-white/90 ${
-                isSelected 
-                  ? "border-emerald-500/80 ring-2 ring-emerald-500/20 bg-white/90 shadow-md -translate-y-0.5" 
+              className={`bg-white/70 rounded-2xl sm:rounded-[24px] p-4 sm:p-5 shadow-sm cursor-pointer border transition-all duration-300 group hover:shadow-md hover:bg-white/90 ${
+                isSelected
+                  ? "border-emerald-500/80 ring-2 ring-emerald-500/20 bg-white/90 shadow-md -translate-y-0.5"
                   : "border-slate-200/60 hover:-translate-y-0.5"
               }`}
             >
@@ -266,25 +588,30 @@ export default function Dashboard({ onBack }) {
                   <p className="text-slate-400 font-semibold text-[11px] sm:text-xs uppercase tracking-wider group-hover:text-emerald-700 transition-colors">
                     {item.title}
                   </p>
+
                   <h2 className="text-2xl sm:text-3xl font-black mt-1 sm:mt-2 text-slate-800 tracking-tight">
                     {item.value}
                   </h2>
                 </div>
+
                 <div
                   className={`bg-gradient-to-br ${item.color} w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition-transform duration-300 shrink-0`}
                 >
                   <Icon size={20} />
                 </div>
               </div>
+
               <p className="text-[11px] sm:text-xs text-emerald-600 font-semibold mt-3 sm:mt-4 flex items-center gap-1">
-                {isSelected ? "Showing Details Below" : "Click to view details"}
+                {isSelected
+                  ? "Showing Details Below"
+                  : "Click to view details"}
               </p>
             </div>
           );
         })}
       </div>
 
-      {/* Dynamic Details Section Based on Clicked Card */}
+      {/* Dynamic Details Section */}
       <div className="mt-4 sm:mt-6 bg-white/70 rounded-2xl sm:rounded-[24px] p-4 sm:p-6 shadow-sm border border-slate-200/60">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-slate-200/60 gap-2">
           <h3 className="text-base sm:text-xl font-extrabold text-slate-800 tracking-tight capitalize">
@@ -292,8 +619,9 @@ export default function Dashboard({ onBack }) {
             {selectedCard === "orders" && "Today's Orders List"}
             {selectedCard === "profit" && "Today's Profit Breakdown"}
           </h3>
+
           <span className="text-[11px] sm:text-xs bg-emerald-500/10 text-emerald-800 px-3 py-1 rounded-full font-bold border border-emerald-500/20 shadow-sm">
-            Today: {todayStr}
+            Report: {reportDateLabel}
           </span>
         </div>
 
@@ -301,7 +629,9 @@ export default function Dashboard({ onBack }) {
         {(selectedCard === "sales" || selectedCard === "profit") && (
           <div>
             {flattenedTodaysTransactions.length === 0 ? (
-              <p className="text-slate-400 text-center py-8 text-xs sm:text-sm font-medium">No records found for today.</p>
+              <p className="text-slate-400 text-center py-8 text-xs sm:text-sm font-medium">
+                No records found for this period.
+              </p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[500px] sm:min-w-full">
@@ -309,29 +639,43 @@ export default function Dashboard({ onBack }) {
                     <tr className="border-b border-slate-200/60 text-[11px] sm:text-xs text-slate-400 uppercase tracking-wider">
                       <th className="pb-3 font-bold">Product Name</th>
                       <th className="pb-3 font-bold">Quantity</th>
-                      <th className="pb-3 font-bold">{selectedCard === "profit" ? "Estimated Profit" : "Amount"}</th>
+                      <th className="pb-3 font-bold">
+                        {selectedCard === "profit"
+                          ? "Estimated Profit"
+                          : "Amount"}
+                      </th>
                       <th className="pb-3 font-bold">Date / Time</th>
                     </tr>
                   </thead>
+
                   <tbody className="divide-y divide-slate-200/40 text-xs sm:text-sm">
-                    {flattenedTodaysTransactions.map((t, idx) => {
-                      if (!t) return null;
-                      const matchedProduct = products.find((p) => p && p.name && t.title && p.name.toLowerCase() === t.title.toLowerCase());
-                      let itemProfit = 0;
-                      if (matchedProduct) {
-                        itemProfit = (parseFloat(matchedProduct.sell || 0) - parseFloat(matchedProduct.buy || 0)) * parseInt(t.quantity || 1);
-                      } else {
-                        itemProfit = (t.amount || 0) * 0.3;
-                      }
+                    {flattenedTodaysTransactions.map((item, index) => {
+                      if (!item) return null;
+
+                      const itemProfit = calculateItemProfit(item);
 
                       return (
-                        <tr key={idx} className="hover:bg-white/50 transition-colors">
-                          <td className="py-3 font-bold text-slate-700">{t.title || "Unknown"}</td>
-                          <td className="py-3 text-slate-600 font-medium">{t.quantity || 1} pcs</td>
-                          <td className="py-3 font-black text-emerald-600">
-                            {selectedCard === "profit" ? `৳ ${Math.round(itemProfit)}` : `৳ ${t.amount || 0}`}
+                        <tr
+                          key={index}
+                          className="hover:bg-white/50 transition-colors"
+                        >
+                          <td className="py-3 font-bold text-slate-700">
+                            {item.title || "Unknown"}
                           </td>
-                          <td className="py-3 text-slate-400 text-[11px] sm:text-xs font-medium">{t.date || todayStr}</td>
+
+                          <td className="py-3 text-slate-600 font-medium">
+                            {item.quantity || 1} pcs
+                          </td>
+
+                          <td className="py-3 font-black text-emerald-600">
+                            {selectedCard === "profit"
+                              ? `৳ ${Math.round(itemProfit)}`
+                              : `৳ ${item.amount || 0}`}
+                          </td>
+
+                          <td className="py-3 text-slate-400 text-[11px] sm:text-xs font-medium">
+                            {item.date || todayStr}
+                          </td>
                         </tr>
                       );
                     })}
@@ -346,7 +690,9 @@ export default function Dashboard({ onBack }) {
         {selectedCard === "orders" && (
           <div>
             {todaysTransactionsRaw.length === 0 ? (
-              <p className="text-slate-400 text-center py-8 text-xs sm:text-sm font-medium">No orders found for today.</p>
+              <p className="text-slate-400 text-center py-8 text-xs sm:text-sm font-medium">
+                No orders found for this period.
+              </p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse min-w-[500px] sm:min-w-full">
@@ -357,20 +703,43 @@ export default function Dashboard({ onBack }) {
                       <th className="pb-3 font-bold">Date / Time</th>
                     </tr>
                   </thead>
+
                   <tbody className="divide-y divide-slate-200/40 text-xs sm:text-sm">
-                    {todaysTransactionsRaw.map((t, idx) => {
-                      if (!t) return null;
-                      const orderSummary = t.items 
-                        ? t.items.map(i => `${i.name} (${i.qty} pcs)`).join(', ') 
-                        : (t.title ? `${t.title} (${t.quantity || 1} pcs)` : "Single Order");
+                    {todaysTransactionsRaw.map((transaction, index) => {
+                      if (!transaction) return null;
+
+                      const orderSummary = Array.isArray(
+                        transaction.items
+                      )
+                        ? transaction.items
+                            .map(
+                              (item) =>
+                                `${item.name} (${item.qty} pcs)`
+                            )
+                            .join(", ")
+                        : transaction.title
+                          ? `${transaction.title} (${transaction.quantity || 1} pcs)`
+                          : "Single Order";
 
                       return (
-                        <tr key={idx} className="hover:bg-white/50 transition-colors">
+                        <tr
+                          key={transaction.id || index}
+                          className="hover:bg-white/50 transition-colors"
+                        >
                           <td className="py-3 font-bold text-slate-700">
-                            Order #{idx + 1}: <span className="text-slate-600 font-normal">{orderSummary}</span>
+                            Order #{index + 1}:{" "}
+                            <span className="text-slate-600 font-normal">
+                              {orderSummary}
+                            </span>
                           </td>
-                          <td className="py-3 font-black text-emerald-600">৳ {t.amount || 0}</td>
-                          <td className="py-3 text-slate-400 text-[11px] sm:text-xs font-medium">{t.date || todayStr}</td>
+
+                          <td className="py-3 font-black text-emerald-600">
+                            ৳ {transaction.amount || 0}
+                          </td>
+
+                          <td className="py-3 text-slate-400 text-[11px] sm:text-xs font-medium">
+                            {transaction.date || todayStr}
+                          </td>
                         </tr>
                       );
                     })}

@@ -6,13 +6,13 @@ import {
   X,
   ExternalLink,
 } from "lucide-react";
-import { SiHomeassistantcommunitystore, SiCoffeescript } from "react-icons/si";
+import { SiHomeassistantcommunitystore } from "react-icons/si";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 import { GiBookmark } from "react-icons/gi";
 import { BsCalculatorFill } from "react-icons/bs";
 import { useState, useEffect } from "react";
-
+import { IoFastFood } from "react-icons/io5";
 const menus = [
   { title: "Homepage", path: "/", icon: SiHomeassistantcommunitystore },
   { title: "Dashboard", path: "/dashboard", icon: AiOutlineDashboard },
@@ -49,7 +49,7 @@ export default function Navbar() {
     };
   }, [mobileOpen, isImageZoomed]);
 
-  const profileImageUrl = "/assets/logo/tea.png";
+  const profileImageUrl = "/assets/logo/Khanaghor.png";
   const googleMapUrl = "https://www.google.com/maps/place/%E0%A6%9A%E0%A6%BE+%E0%A6%AC%E0%A6%BE%E0%A6%97%E0%A6%BE%E0%A6%6E/@23.4641434,90.2865942,19z/data=!4m14!1m7!3m6!1s0x37559f0046545ee7:0x314ab1ead61fc9f4!2z4Kaa4Ka-IOCmrOCmvuCml-CmvuCmqA!8m2!3d23.4641814!4d90.2865936!16s%2Fg%2F11zg1dg487!3m5!1s0x37559f0046545ee7:0x314ab1ead61fc9f4!8m2!3d23.4641814!4d90.2865936!16s%2Fg%2F11zg1dg487?entry=ttu&g_ep=EgoyMDI2MDcyOS4wIKXMDSoASAFQAw%3D%3D";
 
   return (
@@ -60,13 +60,13 @@ export default function Navbar() {
         className="lg:hidden fixed top-4 right-4 z-40 backdrop-blur-md bg-white/75 border border-white/80 text-[#0A5D2D] p-2.5 rounded-2xl shadow-xl transition-all duration-300 active:scale-95"
       >
         <div className="relative w-[22px] h-[22px] flex items-center justify-center">
-          <Menu 
-            size={22} 
-            className={`absolute transition-all duration-300 transform ${mobileOpen ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"}`} 
+          <Menu
+            size={22}
+            className={`absolute transition-all duration-300 transform ${mobileOpen ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"}`}
           />
-          <X 
-            size={22} 
-            className={`absolute transition-all duration-300 transform ${mobileOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"}`} 
+          <X
+            size={22}
+            className={`absolute transition-all duration-300 transform ${mobileOpen ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"}`}
           />
         </div>
       </button>
@@ -74,9 +74,8 @@ export default function Navbar() {
       {/* Overlay with Smooth Fade Animation */}
       <div
         onClick={() => setMobileOpen(false)}
-        className={`fixed inset-0 bg-black/50 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300 ${
-          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-black/50 backdrop-blur-xs z-40 lg:hidden transition-opacity duration-300 ${mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
       />
 
       <aside
@@ -98,25 +97,27 @@ export default function Navbar() {
         <div className="relative z-10 flex-1 overflow-y-auto">
           <div className="px-4 pt-6 pb-4 flex items-center justify-between">
             {(!collapse || isMobile) && (
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 onClick={() => isMobile && setMobileOpen(false)}
                 className="flex items-center gap-3 group cursor-pointer"
               >
                 <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md shrink-0 transition-transform group-hover:scale-105">
-                  <SiCoffeescript className="text-[#0A5D2D]" size={24} />
+                  <IoFastFood className="text-[#0A5D2D]" size={24} />
                 </div>
                 <div>
-                  <h2 className="font-bold text-lg group-hover:text-emerald-200 transition-colors">Tea Garden</h2>
-                  <p className="text-[10px] text-white/70">Tea Management</p>
+                  <h2 className="font-bold text-lg group-hover:text-emerald-200 transition-colors">
+                    Khanaghor</h2>
+                  <p className="text-[10px] text-white/70">
+                    Khanaghor Management</p>
                 </div>
               </Link>
             )}
 
             {/* When collapsed, clicking the top icon/logo can also go to home */}
             {collapse && !isMobile && (
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md shrink-0 mx-auto hover:scale-105 transition-transform"
                 title="Homepage"
               >
@@ -143,8 +144,7 @@ export default function Navbar() {
                   to={item.path}
                   onClick={() => isMobile && setMobileOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${
-                      isActive ? "bg-white text-[#0B5D2A] shadow-lg font-semibold" : "hover:bg-white/10"
+                    `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${isActive ? "bg-white text-[#0B5D2A] shadow-lg font-semibold" : "hover:bg-white/10"
                     } ${collapse && !isMobile ? "justify-center px-0" : ""}`
                   }
                   title={collapse && !isMobile ? item.title : ""}
@@ -162,19 +162,19 @@ export default function Navbar() {
           <div className={`rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 p-3 flex items-center ${collapse && !isMobile ? "justify-center p-2" : "gap-3"}`}>
             <div className="relative shrink-0">
               {/* Image with Zoom Trigger on Click */}
-              <img 
+              <img
                 src={profileImageUrl}
-                alt="profile" 
+                alt="profile"
                 onClick={() => setIsImageZoomed(true)}
-                className={`rounded-full object-cover border-2 border-white/85 shadow-lg cursor-pointer transition-transform duration-200 hover:scale-105 ${collapse && !isMobile ? "w-9 h-9" : "w-10 h-10"}`} 
+                className={`rounded-full object-cover border-2 border-white/85 shadow-lg cursor-pointer transition-transform duration-200 hover:scale-105 ${collapse && !isMobile ? "w-9 h-9" : "w-10 h-10"}`}
                 title="Click to zoom image"
               />
               <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#0B5D2A] rounded-full pointer-events-none"></span>
             </div>
-            
+
             {/* Clickable Text to Google Map */}
             {(!collapse || isMobile) && (
-              <a 
+              <a
                 href={googleMapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -182,7 +182,7 @@ export default function Navbar() {
                 title="View on Google Maps"
               >
                 <div className="flex items-center gap-1">
-                  <h4 className="font-semibold text-sm truncate group-hover:underline text-white">চা বাগান</h4>
+                  <h4 className="font-semibold text-sm truncate group-hover:underline text-white">Khanaghor</h4>
                   <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity text-emerald-300 shrink-0" />
                 </div>
                 <p className="text-[10px] text-white/70 group-hover:text-white/90 transition-colors">Administrator</p>
@@ -194,27 +194,27 @@ export default function Navbar() {
 
       {/* Image Zoom Modal with Animation */}
       {isImageZoomed && (
-        <div 
+        <div
           onClick={() => setIsImageZoomed(false)}
           className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300 animate-fadeIn"
         >
           <div className="relative max-w-lg w-full flex flex-col items-center">
             {/* Close Button */}
-            <button 
+            <button
               onClick={() => setIsImageZoomed(false)}
               className="absolute -top-12 right-0 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-colors"
             >
               <X size={24} />
             </button>
-            
+
             {/* Zoomed Image */}
-            <img 
-              src={profileImageUrl} 
-              alt="Zoomed profile" 
+            <img
+              src={profileImageUrl}
+              alt="Zoomed profile"
               className="max-h-[80vh] max-w-full rounded-2xl shadow-2xl border-4 border-white/20 object-contain animate-scaleUp"
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => e.stopPropagation()}
             />
-            <p className="text-white/80 mt-4 text-sm font-medium">চা বাগান Administrator</p>
+            <p className="text-white/80 mt-4 text-sm font-medium">Khanaghor Administrator</p>
           </div>
         </div>
       )}
