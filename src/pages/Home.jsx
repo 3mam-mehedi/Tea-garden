@@ -501,7 +501,7 @@ export default function Home() {
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-blue-600/20 text-[11px] sm:text-xs font-bold tracking-wide uppercase text-black mb-2">
               <Flame
                 size={18}
-                className="text-amber-400 fill-amber-500 animate-pulse"
+                className="text-amber-500 fill-amber-500 animate-pulse"
               />
               Best Product Today
             </div>
